@@ -86,15 +86,18 @@ export function ComicCover({ onOpenInvitation, data, guestName }: ComicCoverProp
             {data.weddingDate}
           </p>
 
-          {/* Dedicated Personalized Guest Greeting */}
-          {guestName && (
-            <div className="mt-4 mb-2 inline-block bg-[#ede5d8] border-2 border-stone-800 rounded-xl px-5 py-2.5 text-center shadow-xs animate-in fade-in">
-              <p className="font-hand text-xs text-stone-600 font-bold">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
-              <p className="font-hand font-extrabold text-base sm:text-lg text-stone-900 mt-0.5 tracking-wide">
-                {guestName}
-              </p>
-            </div>
-          )}
+          {/* Dedicated Personalized Guest Greeting Card */}
+          <div className="mt-4 mb-2 inline-block bg-[#efe7db] border-2 border-stone-800 rounded-2xl px-6 py-3.5 text-center shadow-sm animate-in fade-in max-w-xs w-full">
+            <p className="font-hand text-xs text-stone-600 font-bold uppercase tracking-wider">
+              Kepada Yth. Bapak/Ibu/Saudara/i:
+            </p>
+            <p className="font-hand font-extrabold text-lg sm:text-xl text-stone-900 mt-1 tracking-wide">
+              {guestName || 'Tamu Undangan'}
+            </p>
+            <p className="font-hand text-[11px] text-stone-500 mt-0.5">
+              di Tempat
+            </p>
+          </div>
 
           <p className="font-hand text-stone-600 text-sm sm:text-base mt-2 max-w-md mx-auto">
             Kami mengundang Anda untuk hadir di hari bahagia kami
@@ -105,9 +108,9 @@ export function ComicCover({ onOpenInvitation, data, guestName }: ComicCoverProp
             <button
               id="btn-lihat-undangan"
               onClick={onOpenInvitation}
-              className="inline-flex items-center gap-2.5 bg-[#2d3136] hover:bg-stone-900 active:scale-95 text-[#fdfbf7] font-hand font-bold text-base sm:text-lg px-8 py-3 rounded-full border-2 border-stone-800 shadow-md transition-all cursor-pointer group"
+              className="inline-flex items-center gap-3 bg-[#24292e] hover:bg-stone-900 active:scale-95 text-amber-200 hover:text-white font-hand font-extrabold text-base sm:text-lg px-9 py-3.5 rounded-full border-2 border-stone-800 shadow-md transition-all cursor-pointer group hover:shadow-lg hover:-translate-y-0.5"
             >
-              <Mail className="w-5 h-5 text-amber-200 group-hover:scale-110 transition-transform" />
+              <Mail className="w-5 h-5 text-amber-300 group-hover:scale-110 transition-transform" />
               <span>Buka Undangan</span>
             </button>
           </div>

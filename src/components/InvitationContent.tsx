@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Calendar,
   Clock,
@@ -23,6 +23,7 @@ import {
   PolaroidGallery,
 } from './ComicDoodles';
 import { InvitationData } from '../types/invitation';
+import { weddingAudio } from '../utils/audio';
 
 interface Wish {
   id: string;
@@ -68,7 +69,16 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
   const [newWishMessage, setNewWishMessage] = useState('');
   const [copiedBank, setCopiedBank] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
-  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const [isPlayingMusic, setIsPlayingMusic] = useState(() => weddingAudio.getStatus());
+
+  useEffect(() => {
+    setIsPlayingMusic(weddingAudio.getStatus());
+  }, []);
+
+  const handleToggleMusic = () => {
+    const active = weddingAudio.toggle();
+    setIsPlayingMusic(active);
+  };
 
   const handleRsvpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,7 +149,7 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
       {/* Floating Audio / Ambient Music Button */}
       <div className="fixed top-4 right-4 z-40">
         <button
-          onClick={() => setIsPlayingMusic(!isPlayingMusic)}
+          onClick={handleToggleMusic}
           aria-label="Putar Musik"
           className="w-10 h-10 rounded-full bg-white/90 border-2 border-stone-800 shadow-md flex items-center justify-center text-stone-800 hover:bg-stone-100 transition-transform active:scale-95 cursor-pointer backdrop-blur-xs"
         >

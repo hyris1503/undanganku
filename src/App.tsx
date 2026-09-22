@@ -17,56 +17,47 @@ import {
   HelpCircle,
   Eye,
   Sparkles,
+  Settings,
 } from 'lucide-react';
 import { InvitationData, defaultInvitationData } from './types/invitation';
+import { weddingAudio } from './utils/audio';
 
 export default function App() {
-  // Check URL query params for guest mode
+  // BY DEFAULT: 100% Clean Guest Mode!
+  // Toolbar is completely hidden unless URL has ?edit=true or ?admin=true
   const [isGuestMode, setIsGuestMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (
-        params.has('to') ||
-        params.has('tamu') ||
-        params.get('mode') === 'tamu' ||
-        params.get('guest') === 'true'
-      ) {
-        return true;
+      if (params.get('edit') === 'true' || params.get('admin') === 'true') {
+        return false;
       }
       try {
-        const saved = localStorage.getItem('wedding_guest_mode');
-        if (saved === 'true') return true;
+        const saved = localStorage.getItem('wedding_view_mode');
+        if (saved === 'edit') return false;
       } catch {
         // Ignore
       }
     }
-    return false;
+    return true; // Default: Clean guest view
   });
 
   const [guestName, setGuestName] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      const to = params.get('to') || params.get('u') || params.get('tamu');
-      if (to) return to;
+      const raw = params.get('to') || params.get('u') || params.get('tamu') || params.get('nama');
+      if (raw) {
+        try {
+          return decodeURIComponent(raw.replace(/\+/g, ' '));
+        } catch {
+          return raw;
+        }
+      }
     }
     return 'Tamu Undangan';
   });
 
-  // In guest mode, default view is 'cover' (Comic Cover)
-  const [activeTab, setActiveTab] = useState<'both' | 'cover' | 'invitation'>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (
-        params.has('to') ||
-        params.has('tamu') ||
-        params.get('mode') === 'tamu' ||
-        params.get('guest') === 'true'
-      ) {
-        return 'cover';
-      }
-    }
-    return 'both';
-  });
+  // By default, only show the Cover (Foto 1) so guest has a true invitation opening experience
+  const [activeTab, setActiveTab] = useState<'both' | 'cover' | 'invitation'>('cover');
 
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [showCustomizerModal, setShowCustomizerModal] = useState(false);
@@ -101,8 +92,13 @@ export default function App() {
     }
   };
 
+  // Called when guest clicks "Buka Undangan"
   const handleOpenInvitation = () => {
+    // 1. Play romantic background music
+    weddingAudio.start();
+    // 2. Switch to full invitation (Foto 2)
     setActiveTab('invitation');
+    // 3. Smooth scroll to top of invitation
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -116,7 +112,7 @@ export default function App() {
     if (customName) setGuestName(customName);
     setActiveTab('cover');
     try {
-      localStorage.setItem('wedding_guest_mode', 'true');
+      localStorage.setItem('wedding_view_mode', 'guest');
     } catch {
       // Ignore
     }
@@ -126,7 +122,7 @@ export default function App() {
   const handleExitGuestMode = () => {
     setIsGuestMode(false);
     try {
-      localStorage.removeItem('wedding_guest_mode');
+      localStorage.setItem('wedding_view_mode', 'edit');
     } catch {
       // Ignore
     }
