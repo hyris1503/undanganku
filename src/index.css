@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2b2b2b;
+    background-color: #f6f2ea;
+  }
+
+  h1, h2, h3, .font-hand {
+    font-family: 'Patrick Hand', cursive, sans-serif;
+  }
+
+  .font-script {
+    font-family: 'Caveat', cursive, sans-serif;
+  }
+}
+
+/* Doodle border styling */
+.doodle-card {
+  border: 1.5px solid #2e2e2e;
+  border-radius: 12px;
+  background-color: #fffdfa;
+  box-shadow: 2px 3px 0px rgba(0,0,0,0.06);
+}
+
+.doodle-button {
+  border: 1.5px solid #2e2e2e;
+  border-radius: 9999px;
+  transition: all 0.15s ease-in-out;
+}
+
+.doodle-button:active {
+  transform: translateY(1px);
+}
+
+/* Subtle paper texture */
+.paper-bg {
+  background-color: #f7f3ec;
+  background-image: radial-gradient(#e4ddd1 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}

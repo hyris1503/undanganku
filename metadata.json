@@ -1,0 +1,6 @@
+{
+  "name": "Undangan Pernikahan Andi & Sinta",
+  "description": "Undangan pernikahan digital Andi & Sinta dengan komik ilustrasi, detail acara, lokasi, galeri foto, konfirmasi kehadiran RSVP, ucapan & doa, dan kado pernikahan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
