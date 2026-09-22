@@ -11,6 +11,9 @@ import {
   CreditCard,
   BookOpen,
   Copy,
+  Share2,
+  Send,
+  Eye,
 } from 'lucide-react';
 import { InvitationData, defaultInvitationData } from '../types/invitation';
 
@@ -20,9 +23,10 @@ interface CustomizerModalProps {
   currentData: InvitationData;
   onSave: (newData: InvitationData) => void;
   onReset: () => void;
+  onPreviewGuestMode?: (name?: string) => void;
 }
 
-type TabKey = 'mempelai' | 'acara' | 'lokasi' | 'cerita' | 'komik' | 'hadiah';
+type TabKey = 'mempelai' | 'acara' | 'lokasi' | 'cerita' | 'komik' | 'hadiah' | 'tamu';
 
 export function CustomizerModal({
   isOpen,
@@ -30,11 +34,15 @@ export function CustomizerModal({
   currentData,
   onSave,
   onReset,
+  onPreviewGuestMode,
 }: CustomizerModalProps) {
   const [formData, setFormData] = useState<InvitationData>(currentData);
   const [activeTab, setActiveTab] = useState<TabKey>('mempelai');
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [copiedJson, setCopiedJson] = useState(false);
+  const [sampleGuestName, setSampleGuestName] = useState('Bapak Budi & Keluarga');
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedWaMessage, setCopiedWaMessage] = useState(false);
 
   useEffect(() => {
     setFormData(currentData);
@@ -42,7 +50,7 @@ export function CustomizerModal({
 
   if (!isOpen) return null;
 
-  const handleChange = (field: keyof InvitationData, value: string) => {
+  const handleChange = <K extends keyof InvitationData>(field: K, value: InvitationData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -178,6 +186,18 @@ export function CustomizerModal({
           >
             <CreditCard className="w-3.5 h-3.5 text-stone-700" />
             <span>Rekening</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('tamu')}
+            className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'tamu'
+                ? 'bg-[#fcfaf5] text-stone-900 border-t-2 border-x-2 border-stone-800'
+                : 'text-emerald-700 hover:text-emerald-900 font-extrabold'
+            }`}
+          >
+            <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Kirim ke Tamu</span>
           </button>
         </div>
 
@@ -495,6 +515,26 @@ export function CustomizerModal({
                   className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
                 />
               </div>
+
+              {/* Opsi Tampilan Bar Browser */}
+              <div className="pt-3.5 mt-3.5 border-t border-stone-300 bg-stone-50 p-3 rounded-xl">
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={formData.showBrowserMockup !== false}
+                    onChange={(e) => handleChange('showBrowserMockup', e.target.checked)}
+                    className="w-4 h-4 mt-0.5 rounded-sm border-stone-400 text-stone-900 focus:ring-0 cursor-pointer"
+                  />
+                  <div>
+                    <span className="font-bold text-xs text-stone-900">
+                      Tampilkan Bingkai Bar Browser Hitam di Sampul (<code className="text-[11px] font-mono">undanganku.com/...</code>)
+                    </span>
+                    <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed">
+                      💡 <em>Ingin tampilan bersih tanpa bar browser?</em> Cukup hilangkan tanda centang ini, maka kartu sampul komik akan tampil bersih dan elegan dengan sudut membulat.
+                    </p>
+                  </div>
+                </label>
+              </div>
             </div>
           )}
 
@@ -583,6 +623,119 @@ export function CustomizerModal({
                   className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
                 />
               </div>
+            </div>
+          )}
+
+          {/* TAB 7: KIRIM KE TAMU (GUEST MODE & LINKS) */}
+          {activeTab === 'tamu' && (
+            <div className="space-y-4">
+              <div className="bg-emerald-50 border-2 border-emerald-600/60 rounded-xl p-4 text-emerald-950">
+                <h4 className="font-bold text-sm flex items-center gap-1.5 mb-1 text-emerald-900">
+                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <span>Fitur Undangan Bersih Khusus Tamu</span>
+                </h4>
+                <p className="text-xs leading-relaxed text-emerald-800">
+                  Saat tamu membuka undangan Anda, mereka akan disuguhkan <strong>tampilan bersih tanpa bilah menu edit atau tombol admin</strong>. Anda juga bisa menyematkan nama tamu secara dinamis di sampul depan!
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Nama Tamu yang Dituju
+                </label>
+                <input
+                  type="text"
+                  value={sampleGuestName}
+                  onChange={(e) => setSampleGuestName(e.target.value)}
+                  placeholder="Contoh: Bapak Budi & Keluarga"
+                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
+                />
+                <p className="text-[11px] text-stone-500 mt-1">
+                  Nama ini otomatis dicantumkan di kartu sampul komik (&ldquo;Kepada Yth. Bapak/Ibu/Saudara/i&rdquo;).
+                </p>
+              </div>
+
+              {/* Generated URL Box */}
+              <div className="bg-stone-50 border border-stone-300 rounded-xl p-3.5 space-y-2">
+                <span className="text-xs font-bold text-stone-800 block">
+                  🔗 Link Undangan Tamu (Siap Dibagikan):
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName)}`}
+                    className="flex-1 bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-800 select-all outline-hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = `${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName)}`;
+                      navigator.clipboard.writeText(url);
+                      setCopiedLink(true);
+                      setTimeout(() => setCopiedLink(false), 2000);
+                    }}
+                    className="bg-stone-800 hover:bg-stone-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shrink-0 cursor-pointer"
+                  >
+                    {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedLink ? 'Tersalin!' : 'Salin'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* WhatsApp Share Template */}
+              <div className="bg-stone-50 border border-stone-300 rounded-xl p-3.5 space-y-2">
+                <span className="text-xs font-bold text-stone-800 block">
+                  💬 Contoh Pesan WhatsApp Siap Kirim:
+                </span>
+                <div className="bg-white border border-stone-200 rounded-lg p-2.5 text-xs font-sans text-stone-800 leading-relaxed max-h-28 overflow-y-auto whitespace-pre-line">
+                  {`Kepada Yth. ${sampleGuestName || 'Bapak/Ibu/Saudara/i'},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir di acara pernikahan kami:\n\n*${formData.groomName} & ${formData.brideName}*\n📅 ${formData.weddingDateFull}\n📍 ${formData.venueName}\n\nUntuk informasi lengkap acara dan konfirmasi kehadiran, silakan kunjungi tautan undangan berikut:\n${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName || 'Tamu')}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan memberikan doa restu.\n\nTerima kasih.`}
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const msg = `Kepada Yth. ${sampleGuestName || 'Bapak/Ibu/Saudara/i'},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir di acara pernikahan kami:\n\n*${formData.groomName} & ${formData.brideName}*\n📅 ${formData.weddingDateFull}\n📍 ${formData.venueName}\n\nUntuk informasi lengkap acara dan konfirmasi kehadiran, silakan kunjungi tautan undangan berikut:\n${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName || 'Tamu')}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan memberikan doa restu.\n\nTerima kasih.`;
+                      navigator.clipboard.writeText(msg);
+                      setCopiedWaMessage(true);
+                      setTimeout(() => setCopiedWaMessage(false), 2000);
+                    }}
+                    className="bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>{copiedWaMessage ? 'Pesan Tersalin!' : 'Salin Teks WhatsApp'}</span>
+                  </button>
+
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(`Kepada Yth. ${sampleGuestName || 'Bapak/Ibu/Saudara/i'},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir di acara pernikahan kami:\n\n*${formData.groomName} & ${formData.brideName}*\n📅 ${formData.weddingDateFull}\n📍 ${formData.venueName}\n\nUntuk informasi lengkap acara dan konfirmasi kehadiran, silakan kunjungi tautan undangan berikut:\n${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName || 'Tamu')}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan memberikan doa restu.\n\nTerima kasih.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Buka WhatsApp</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Action: Preview in Guest Mode right now */}
+              {onPreviewGuestMode && (
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onSave(formData);
+                      onPreviewGuestMode(sampleGuestName);
+                      onClose();
+                    }}
+                    className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+                  >
+                    <Eye className="w-4 h-4" />
+                    <span>Lihat Langsung Versi Tamu Ini (Simulasi Tampilan Tamu)</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -28,6 +28,7 @@ export interface InvitationData {
   bankName: string;
   bankAccountNumber: string;
   bankAccountHolder: string;
+  showBrowserMockup?: boolean;
 }
 
 export const defaultInvitationData: InvitationData = {
