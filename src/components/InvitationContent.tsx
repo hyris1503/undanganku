@@ -147,10 +147,17 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
       </div>
 
       {/* Floating Audio / Ambient Music Button */}
-      <div className="fixed top-4 right-4 z-40">
+      <div className="fixed top-4 right-4 z-40 flex items-center gap-2">
+        {data.musicTitle && isPlayingMusic && (
+          <div className="hidden sm:flex items-center gap-1.5 bg-stone-900/85 text-amber-200 text-[11px] font-hand font-bold px-3 py-1 rounded-full border border-stone-700 shadow-sm backdrop-blur-xs animate-in fade-in">
+            <span className="text-xs">🎵</span>
+            <span className="max-w-[150px] truncate">{data.musicTitle}</span>
+          </div>
+        )}
         <button
           onClick={handleToggleMusic}
           aria-label="Putar Musik"
+          title={isPlayingMusic ? `Matikan Musik (${data.musicTitle || 'Musik'})` : 'Nyalakan Musik'}
           className="w-10 h-10 rounded-full bg-white/90 border-2 border-stone-800 shadow-md flex items-center justify-center text-stone-800 hover:bg-stone-100 transition-transform active:scale-95 cursor-pointer backdrop-blur-xs"
         >
           {isPlayingMusic ? (

@@ -29,6 +29,8 @@ export interface InvitationData {
   bankAccountNumber: string;
   bankAccountHolder: string;
   showBrowserMockup?: boolean;
+  musicUrl?: string;
+  musicTitle?: string;
 }
 
 export const defaultInvitationData: InvitationData = {
@@ -60,5 +62,7 @@ export const defaultInvitationData: InvitationData = {
   },
   bankName: "Bank BCA",
   bankAccountNumber: "1234 5678 9012",
-  bankAccountHolder: "Andi & Sinta",
+  bankAccountHolder: "Haris & Febri",
+  musicUrl: "/until-i-found-you.mp3",
+  musicTitle: "Until I Found You - Stephen Sanchez",
 };

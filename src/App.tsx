@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ComicCover } from './components/ComicCover';
 import { InvitationContent } from './components/InvitationContent';
 import { HtmlCodeModal } from './components/HtmlCodeModal';
@@ -67,12 +67,28 @@ export default function App() {
   const [invitationData, setInvitationData] = useState<InvitationData>(() => {
     try {
       const saved = localStorage.getItem('wedding_invitation_data');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // If old sample data was saved, prioritize updated default values
+        if (parsed.groomName !== 'Andi') {
+          const merged = { ...defaultInvitationData, ...parsed };
+          if (!parsed.musicUrl || parsed.musicUrl.includes('Pachelbel') || parsed.musicUrl.includes('Canon')) {
+            merged.musicUrl = defaultInvitationData.musicUrl;
+            merged.musicTitle = defaultInvitationData.musicTitle;
+          }
+          return merged;
+        }
+      }
     } catch {
       // Fallback
     }
     return defaultInvitationData;
   });
+
+  // Synchronize audio URL with audio controller
+  useEffect(() => {
+    weddingAudio.setAudioUrl(invitationData.musicUrl);
+  }, [invitationData.musicUrl]);
 
   const handleSaveData = (newData: InvitationData) => {
     setInvitationData(newData);

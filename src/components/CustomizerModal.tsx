@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   X,
   RotateCcw,
@@ -14,8 +14,13 @@ import {
   Share2,
   Send,
   Eye,
+  Music,
+  Play,
+  Pause,
+  Volume2,
 } from 'lucide-react';
 import { InvitationData, defaultInvitationData } from '../types/invitation';
+import { PRESET_SONGS, SongPreset } from '../utils/audio';
 
 interface CustomizerModalProps {
   isOpen: boolean;
@@ -26,7 +31,7 @@ interface CustomizerModalProps {
   onPreviewGuestMode?: (name?: string) => void;
 }
 
-type TabKey = 'mempelai' | 'acara' | 'lokasi' | 'cerita' | 'komik' | 'hadiah' | 'tamu';
+type TabKey = 'mempelai' | 'acara' | 'lokasi' | 'cerita' | 'komik' | 'hadiah' | 'musik' | 'tamu';
 
 export function CustomizerModal({
   isOpen,
@@ -43,6 +48,61 @@ export function CustomizerModal({
   const [sampleGuestName, setSampleGuestName] = useState('Bapak Budi & Keluarga');
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedWaMessage, setCopiedWaMessage] = useState(false);
+
+  // Audio preview state
+  const [previewingSongId, setPreviewingSongId] = useState<string | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause();
+        previewAudioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleTogglePreview = (songId: string, url: string) => {
+    if (previewingSongId === songId) {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause();
+      }
+      setPreviewingSongId(null);
+      return;
+    }
+
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current = null;
+    }
+
+    if (!url) {
+      setPreviewingSongId(null);
+      return;
+    }
+
+    try {
+      const audio = new Audio(url);
+      previewAudioRef.current = audio;
+      setPreviewingSongId(songId);
+      audio.play().catch(() => {
+        setPreviewingSongId(null);
+      });
+      audio.onended = () => {
+        setPreviewingSongId(null);
+      };
+    } catch {
+      setPreviewingSongId(null);
+    }
+  };
+
+  const handleSelectPreset = (song: SongPreset) => {
+    setFormData((prev) => ({
+      ...prev,
+      musicUrl: song.url,
+      musicTitle: `${song.title} - ${song.artist}`,
+    }));
+  };
 
   useEffect(() => {
     setFormData(currentData);
@@ -186,6 +246,18 @@ export function CustomizerModal({
           >
             <CreditCard className="w-3.5 h-3.5 text-stone-700" />
             <span>Rekening</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('musik')}
+            className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'musik'
+                ? 'bg-[#fcfaf5] text-stone-900 border-t-2 border-x-2 border-stone-800'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <Music className="w-3.5 h-3.5 text-rose-600" />
+            <span>Musik Latar</span>
           </button>
 
           <button
@@ -622,6 +694,215 @@ export function CustomizerModal({
                   placeholder="Contoh: Andi & Sinta"
                   className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
                 />
+              </div>
+            </div>
+          )}
+
+          {/* TAB: MUSIK LATAR UNDANGAN */}
+          {activeTab === 'musik' && (
+            <div className="space-y-5">
+              {/* Info banner */}
+              <div className="bg-rose-50 border-2 border-rose-300 rounded-xl p-4 text-rose-950">
+                <h4 className="font-bold text-sm flex items-center gap-1.5 mb-1 text-rose-900">
+                  <Music className="w-4 h-4 text-rose-600" />
+                  <span>Pengaturan Lagu &amp; Musik Latar</span>
+                </h4>
+                <p className="text-xs leading-relaxed text-rose-800">
+                  Musik latar akan otomatis berputar ketika tamu menekan tombol <strong>&ldquo;Buka Undangan&rdquo;</strong>. Tamu juga dapat menjeda atau melanjutkan musik menggunakan tombol mengambang di pojok kanan atas.
+                </p>
+              </div>
+
+              {/* Current Active Song Status */}
+              <div className="bg-white border-2 border-stone-800 rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-xs">
+                <div className="min-w-0">
+                  <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
+                    Lagu Aktif Saat Ini
+                  </span>
+                  <p className="font-hand font-extrabold text-stone-900 text-sm sm:text-base truncate">
+                    {formData.musicTitle || 'Canon in D Major - Johann Pachelbel'}
+                  </p>
+                  <p className="text-[11px] text-stone-600 truncate font-mono">
+                    {formData.musicUrl ? formData.musicUrl : '(Melodi Akustik Sintesis Ringan)'}
+                  </p>
+                </div>
+                {formData.musicUrl && (
+                  <button
+                    type="button"
+                    onClick={() => handleTogglePreview('current', formData.musicUrl || '')}
+                    className={`px-3 py-1.5 rounded-lg border-2 border-stone-800 text-xs font-hand font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 ${
+                      previewingSongId === 'current'
+                        ? 'bg-rose-600 text-white'
+                        : 'bg-stone-100 hover:bg-stone-200 text-stone-800'
+                    }`}
+                  >
+                    {previewingSongId === 'current' ? (
+                      <>
+                        <Pause className="w-3.5 h-3.5" />
+                        <span>Hentikan</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-3.5 h-3.5" />
+                        <span>Tes Putar</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+
+              {/* Preset Songs Selection */}
+              <div>
+                <label className="block text-xs font-bold text-stone-800 uppercase tracking-wider mb-2">
+                  Pilih Lagu Romantis Pilihan (Siap Pakai)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {PRESET_SONGS.map((song) => {
+                    const isSelected =
+                      formData.musicUrl === song.url ||
+                      (!formData.musicUrl && song.id === 'synth-bell');
+                    const isAudioPlaying = previewingSongId === song.id;
+
+                    return (
+                      <div
+                        key={song.id}
+                        className={`p-3 rounded-xl border-2 transition-all flex flex-col justify-between ${
+                          isSelected
+                            ? 'bg-amber-50/80 border-amber-600 shadow-xs'
+                            : 'bg-white border-stone-300 hover:border-stone-500'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-start justify-between gap-1.5">
+                            <h5 className="font-hand font-bold text-stone-900 text-sm leading-tight">
+                              {song.title}
+                            </h5>
+                            {isSelected && (
+                              <span className="bg-amber-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0">
+                                Terpilih
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-stone-500 font-bold mt-0.5">{song.artist}</p>
+                          <p className="text-[11px] text-stone-600 mt-1 leading-snug line-clamp-2">
+                            {song.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-3 pt-2 border-t border-stone-200">
+                          {song.url ? (
+                            <button
+                              type="button"
+                              onClick={() => handleTogglePreview(song.id, song.url)}
+                              className={`p-1.5 rounded-lg border text-xs flex items-center gap-1 cursor-pointer transition-colors ${
+                                isAudioPlaying
+                                  ? 'bg-rose-600 text-white border-rose-700'
+                                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-400'
+                              }`}
+                              title="Dengarkan Contoh"
+                            >
+                              {isAudioPlaying ? (
+                                <Pause className="w-3.5 h-3.5" />
+                              ) : (
+                                <Play className="w-3.5 h-3.5" />
+                              )}
+                              <span className="text-[11px] font-bold">
+                                {isAudioPlaying ? 'Jeda' : 'Dengar'}
+                              </span>
+                            </button>
+                          ) : (
+                            <span className="text-[11px] text-stone-500 italic">Bawaan</span>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleSelectPreset(song)}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-hand font-bold cursor-pointer transition-all ${
+                              isSelected
+                                ? 'bg-stone-800 text-white border border-stone-800'
+                                : 'bg-stone-200 hover:bg-stone-300 text-stone-800 border border-stone-400'
+                            }`}
+                          >
+                            {isSelected ? '✓ Terpilih' : 'Gunakan Lagu Ini'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Custom MP3 URL Input Section */}
+              <div className="bg-stone-50 border-2 border-stone-400 rounded-xl p-4 space-y-3">
+                <h5 className="font-bold text-xs text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🎵</span>
+                  <span>Gunakan Lagu / File MP3 Sendiri</span>
+                </h5>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Judul Lagu &amp; Penyanyi (Teks yang Tampil)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.musicTitle || ''}
+                    onChange={(e) => handleChange('musicTitle', e.target.value)}
+                    placeholder="Contoh: Banda Neira - Sampai Jadi Debu / A Thousand Years"
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Link URL File Audio (.mp3 / .ogg / file lokal)
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={formData.musicUrl || ''}
+                      onChange={(e) => handleChange('musicUrl', e.target.value)}
+                      placeholder="https://.../lagu.mp3 atau /lagu.mp3"
+                      className="flex-1 bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs font-mono text-stone-900 outline-hidden"
+                    />
+                    {formData.musicUrl && (
+                      <button
+                        type="button"
+                        onClick={() => handleTogglePreview('custom', formData.musicUrl || '')}
+                        className="px-3 py-2 bg-stone-800 hover:bg-stone-900 text-white rounded-lg text-xs font-hand font-bold cursor-pointer shrink-0 flex items-center gap-1"
+                      >
+                        {previewingSongId === 'custom' ? (
+                          <>
+                            <Pause className="w-3.5 h-3.5" />
+                            <span>Stop</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-3.5 h-3.5" />
+                            <span>Tes</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Helpful Guide for Custom Songs */}
+                <div className="bg-amber-50/70 border border-amber-300 rounded-lg p-3 text-[11px] text-stone-700 space-y-1.5 leading-relaxed">
+                  <p className="font-bold text-stone-900 flex items-center gap-1">
+                    <span>💡</span>
+                    <span>Cara Memasang Lagu Sendiri:</span>
+                  </p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>
+                      <strong>Cara 1 (File Lokal Proyek):</strong> Masukkan file lagu berformat MP3 ke dalam folder <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">public/lagu.mp3</code>, lalu di kolom link cukup ketik <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">/lagu.mp3</code>.
+                    </li>
+                    <li>
+                      <strong>Cara 2 (Dropbox / Hosting Luar):</strong> Jika mengunggah ke Dropbox, salin link bagikan dan ubah bagian akhir link dari <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">dl=0</code> menjadi <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">dl=1</code> agar menjadi link langsung.
+                    </li>
+                    <li>
+                      <strong>Cara 3 (Kirimkan ke AI Studio):</strong> Anda juga bisa langsung menyebutkan judul lagu yang diinginkan (misal: <em>&ldquo;Tolong ganti lagunya ke lagu X&rdquo;</em>), dan kami akan membantu menyiapkannya!
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           )}
