@@ -173,17 +173,25 @@ export function CustomizerModal({
   if (!isOpen) return null;
 
   const handleChange = <K extends keyof InvitationData>(field: K, value: InvitationData[K]) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const updated = { ...prev, [field]: value };
+      onSave(updated);
+      return updated;
+    });
   };
 
   const handleComicChange = (panel: keyof InvitationData['comicDialogues'], value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      comicDialogues: {
-        ...prev.comicDialogues,
-        [panel]: value,
-      },
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        comicDialogues: {
+          ...prev.comicDialogues,
+          [panel]: value,
+        },
+      };
+      onSave(updated);
+      return updated;
+    });
   };
 
   const handleSave = (e?: React.FormEvent) => {
@@ -193,7 +201,7 @@ export function CustomizerModal({
     setTimeout(() => {
       setSavedSuccess(false);
       onClose();
-    }, 600);
+    }, 400);
   };
 
   const handleResetToDefault = () => {
@@ -219,11 +227,17 @@ export function CustomizerModal({
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-stone-900 leading-tight">
-                Kustomisasi Undangan
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-bold text-stone-900 leading-tight">
+                  Kustomisasi Undangan
+                </h2>
+                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-2 py-0.5 rounded-full font-sans font-semibold">
+                  <Check className="w-3 h-3 text-emerald-600" />
+                  <span>Tersimpan Otomatis</span>
+                </span>
+              </div>
               <p className="text-xs text-stone-600">
-                Ubah teks, nama, tanggal, lokasi, dan dialog komik secara instan
+                Ubah teks, nama, tanggal, lokasi, animasi &amp; bahan langsung tersimpan
               </p>
             </div>
           </div>

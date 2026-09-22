@@ -83,21 +83,51 @@ export default function App() {
       const saved = localStorage.getItem('wedding_invitation_data');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // If old sample data was saved, prioritize updated default values
-        if (parsed.groomName !== 'Andi') {
-          const merged = { ...defaultInvitationData, ...parsed };
-          if (!parsed.musicUrl || parsed.musicUrl.includes('Pachelbel') || parsed.musicUrl.includes('Canon')) {
-            merged.musicUrl = defaultInvitationData.musicUrl;
-            merged.musicTitle = defaultInvitationData.musicTitle;
-          }
-          return merged;
-        }
+        return { ...defaultInvitationData, ...parsed };
       }
     } catch {
       // Fallback
     }
     return defaultInvitationData;
   });
+
+  // Fetch latest data from server so ANY device/guest/browser gets updated data
+  useEffect(() => {
+    const fetchServerData = async () => {
+      try {
+        const res = await fetch('/api/invitation-data');
+        if (res.ok) {
+          const serverData = await res.json();
+          if (serverData && typeof serverData === 'object') {
+            setInvitationData((prev) => {
+              const merged = { ...defaultInvitationData, ...prev, ...serverData };
+              try {
+                localStorage.setItem('wedding_invitation_data', JSON.stringify(merged));
+              } catch {}
+              return merged;
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch server invitation data:', err);
+      }
+    };
+
+    fetchServerData();
+
+    // Listen for storage events across tabs (e.g. admin tab <-> guest tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'wedding_invitation_data' && e.newValue) {
+        try {
+          const updated = JSON.parse(e.newValue);
+          setInvitationData((prev) => ({ ...prev, ...updated }));
+        } catch {}
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Synchronize audio URL with audio controller
   useEffect(() => {
@@ -111,6 +141,15 @@ export default function App() {
     } catch {
       // Ignore storage errors
     }
+
+    // Persist to server so any guest on any device/phone gets this update
+    fetch('/api/invitation-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newData),
+    }).catch((err) => {
+      console.warn('Server save note:', err);
+    });
   };
 
   const handleResetData = () => {
@@ -120,6 +159,11 @@ export default function App() {
     } catch {
       // Ignore storage errors
     }
+    fetch('/api/invitation-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(defaultInvitationData),
+    }).catch(() => {});
   };
 
   // Called when guest clicks "Buka Undangan"
