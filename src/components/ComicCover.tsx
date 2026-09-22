@@ -42,8 +42,19 @@ export function ComicCover({ onOpenInvitation, data, guestName }: ComicCoverProp
           showMockup ? 'rounded-b-xl' : 'rounded-2xl'
         }`}
       >
-        {/* 4-Panel Comic Strip */}
-        <ComicStrip dialogues={data.comicDialogues} />
+        {/* 1. Animasi / Bahan Komik di Awal (Jika diisi URL kustom) */}
+        {data.comicOpeningAnimationUrl ? (
+          <div className="mb-6 rounded-2xl overflow-hidden border-2 border-stone-800 shadow-sm bg-white p-2 text-center">
+            <img
+              src={data.comicOpeningAnimationUrl}
+              alt="Animasi Komik Pembuka"
+              className="w-full max-h-80 object-contain mx-auto rounded-xl"
+            />
+          </div>
+        ) : (
+          /* 4-Panel Comic Strip Default */
+          <ComicStrip dialogues={data.comicDialogues} />
+        )}
 
         {/* Invitation Headline Area */}
         <div className="text-center mt-8 mb-6">

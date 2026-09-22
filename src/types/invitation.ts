@@ -31,6 +31,15 @@ export interface InvitationData {
   showBrowserMockup?: boolean;
   musicUrl?: string;
   musicTitle?: string;
+  // Animasi dan Bahan Kustom (Input via URL)
+  comicOpeningAnimationUrl?: string; // 1. Animasi komik di awal
+  groomAnimationUrl?: string; // 2. Animasi mempelai pria
+  brideAnimationUrl?: string; // 3. Animasi mempelai wanita
+  globalAmbientType?: 'none' | 'leaves' | 'petals' | 'sparkles' | 'hearts' | 'custom'; // 4. Animasi seluruh undangan
+  globalAmbientAnimationUrl?: string; // 4. URL animasi seluruh undangan kustom
+  ourStoryAnimationUrl?: string; // 5. Animasi our story
+  eventDetailAnimationUrl?: string; // 6. Animasi detail acara
+  galleryAnimationUrl?: string; // 7. Animasi galeri foto
 }
 
 export const defaultInvitationData: InvitationData = {
@@ -65,4 +74,12 @@ export const defaultInvitationData: InvitationData = {
   bankAccountHolder: "Haris & Febri",
   musicUrl: "/until-i-found-you.mp3",
   musicTitle: "Until I Found You - Stephen Sanchez",
+  comicOpeningAnimationUrl: "",
+  groomAnimationUrl: "",
+  brideAnimationUrl: "",
+  globalAmbientType: "none",
+  globalAmbientAnimationUrl: "",
+  ourStoryAnimationUrl: "",
+  eventDetailAnimationUrl: "",
+  galleryAnimationUrl: "",
 };

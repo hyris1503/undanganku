@@ -22,6 +22,9 @@ import {
   Download,
   FileSpreadsheet,
   ExternalLink,
+  Film,
+  Image as ImageIcon,
+  Trash2,
 } from 'lucide-react';
 import { InvitationData, defaultInvitationData } from '../types/invitation';
 import { PRESET_SONGS, SongPreset } from '../utils/audio';
@@ -35,7 +38,7 @@ interface CustomizerModalProps {
   onPreviewGuestMode?: (name?: string) => void;
 }
 
-type TabKey = 'mempelai' | 'acara' | 'lokasi' | 'cerita' | 'komik' | 'hadiah' | 'musik' | 'tamu';
+type TabKey = 'mempelai' | 'acara' | 'lokasi' | 'cerita' | 'komik' | 'hadiah' | 'musik' | 'animasi' | 'tamu';
 
 export function CustomizerModal({
   isOpen,
@@ -317,6 +320,18 @@ export function CustomizerModal({
           >
             <Music className="w-3.5 h-3.5 text-rose-600" />
             <span>Musik Latar</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('animasi')}
+            className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'animasi'
+                ? 'bg-[#fcfaf5] text-stone-900 border-t-2 border-x-2 border-stone-800'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <Film className="w-3.5 h-3.5 text-purple-600" />
+            <span>Animasi &amp; Bahan</span>
           </button>
 
           <button
@@ -962,6 +977,389 @@ export function CustomizerModal({
                     </li>
                   </ul>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: ANIMASI & BAHAN KUSTOM */}
+          {activeTab === 'animasi' && (
+            <div className="space-y-6">
+              {/* Highlight Intro */}
+              <div className="bg-purple-50/80 border-2 border-purple-500/60 rounded-xl p-4 text-purple-950">
+                <h4 className="font-bold text-sm flex items-center gap-1.5 mb-1 text-purple-900">
+                  <Film className="w-4 h-4 text-purple-700" />
+                  <span>Kustomisasi Animasi &amp; Bahan Undangan via Link URL</span>
+                </h4>
+                <p className="text-xs leading-relaxed text-purple-800">
+                  Anda dapat mengganti animasi, gambar ilustrasi, GIF, atau karakter di berbagai bagian undangan cukup dengan memasukkan link URL (atau file lokal seperti <code className="bg-purple-100 px-1 py-0.5 rounded font-mono">/nama-file.gif</code>). Kosongkan kolom input jika ingin kembali ke tampilan bawaan.
+                </p>
+              </div>
+
+              {/* 1. Animasi Komik di Awal */}
+              <div className="bg-white border-2 border-stone-800 rounded-xl p-4 space-y-3 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-bold text-sm text-stone-900 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-200 border border-stone-800 flex items-center justify-center text-xs">
+                      1
+                    </span>
+                    <span>Animasi Komik di Awal (Cover Opening)</span>
+                  </h5>
+                  {formData.comicOpeningAnimationUrl && (
+                    <button
+                      type="button"
+                      onClick={() => handleChange('comicOpeningAnimationUrl', '')}
+                      className="text-xs text-rose-600 hover:text-rose-800 flex items-center gap-1 font-bold cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Hapus URL</span>
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-stone-600">
+                  Tampilkan file GIF / animasi / ilustrasi bergerak di sampul depan undangan (mengganti panel strip komik 4-kotak).
+                </p>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Link URL Animasi Komik (.gif / .png / .jpg / .webp)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.comicOpeningAnimationUrl || ''}
+                    onChange={(e) => handleChange('comicOpeningAnimationUrl', e.target.value)}
+                    placeholder="https://.../animasi-komik-awal.gif atau /cover-animasi.gif"
+                    className="w-full bg-[#fcf9f2] border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs font-mono text-stone-900 outline-hidden"
+                  />
+                </div>
+                {formData.comicOpeningAnimationUrl && (
+                  <div className="p-2 border border-dashed border-stone-400 rounded-lg bg-stone-50 text-center">
+                    <p className="text-[11px] text-stone-500 mb-1.5 font-bold">Pratinjau Animasi Komik Awal:</p>
+                    <img
+                      src={formData.comicOpeningAnimationUrl}
+                      alt="Pratinjau Komik Awal"
+                      className="max-h-40 mx-auto object-contain rounded-md border border-stone-300 bg-white"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Animasi Mempelai */}
+              <div className="bg-white border-2 border-stone-800 rounded-xl p-4 space-y-4 shadow-xs">
+                <h5 className="font-bold text-sm text-stone-900 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-amber-200 border border-stone-800 flex items-center justify-center text-xs">
+                    2
+                  </span>
+                  <span>Animasi / Bahan Kedua Mempelai (Avatar Karakter)</span>
+                </h5>
+                <p className="text-xs text-stone-600">
+                  Ganti avatar lingkaran ilustrasi dengan GIF animasi bergerak, stiker animasi, atau foto avatar kedua mempelai.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Mempelai Pria */}
+                  <div className="border border-stone-300 rounded-lg p-3 bg-stone-50 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-stone-800">Mempelai Pria</span>
+                      {formData.groomAnimationUrl && (
+                        <button
+                          type="button"
+                          onClick={() => handleChange('groomAnimationUrl', '')}
+                          className="text-[11px] text-rose-600 hover:text-rose-800 font-bold cursor-pointer"
+                        >
+                          Reset Default
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      type="url"
+                      value={formData.groomAnimationUrl || ''}
+                      onChange={(e) => handleChange('groomAnimationUrl', e.target.value)}
+                      placeholder="URL GIF / Gambar Mempelai Pria"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-900 outline-hidden"
+                    />
+                    {formData.groomAnimationUrl && (
+                      <div className="flex items-center justify-center pt-1">
+                        <img
+                          src={formData.groomAnimationUrl}
+                          alt="Groom Preview"
+                          className="w-16 h-16 rounded-full object-cover border-2 border-stone-800 bg-white"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mempelai Wanita */}
+                  <div className="border border-stone-300 rounded-lg p-3 bg-stone-50 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-stone-800">Mempelai Wanita</span>
+                      {formData.brideAnimationUrl && (
+                        <button
+                          type="button"
+                          onClick={() => handleChange('brideAnimationUrl', '')}
+                          className="text-[11px] text-rose-600 hover:text-rose-800 font-bold cursor-pointer"
+                        >
+                          Reset Default
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      type="url"
+                      value={formData.brideAnimationUrl || ''}
+                      onChange={(e) => handleChange('brideAnimationUrl', e.target.value)}
+                      placeholder="URL GIF / Gambar Mempelai Wanita"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-900 outline-hidden"
+                    />
+                    {formData.brideAnimationUrl && (
+                      <div className="flex items-center justify-center pt-1">
+                        <img
+                          src={formData.brideAnimationUrl}
+                          alt="Bride Preview"
+                          className="w-16 h-16 rounded-full object-cover border-2 border-stone-800 bg-white"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Animasi Seluruh Undangan (Ambient) */}
+              <div className="bg-white border-2 border-stone-800 rounded-xl p-4 space-y-3 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-bold text-sm text-stone-900 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-200 border border-stone-800 flex items-center justify-center text-xs">
+                      3
+                    </span>
+                    <span>Animasi Seluruh Undangan (Efek Daun, Bunga, Partikel)</span>
+                  </h5>
+                </div>
+                <p className="text-xs text-stone-600">
+                  Efek latar belakang melayang lembut di sepanjang halaman undangan (seperti daun gugur, kelopak bunga, atau kilau emas).
+                </p>
+
+                {/* Preset Options */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                  {[
+                    { id: 'none', label: '🚫 Nonaktif', desc: 'Tanpa Efek Latar' },
+                    { id: 'leaves', label: '🍃 Daun Gugur', desc: 'Daun hijau gugur perlahan' },
+                    { id: 'petals', label: '🌸 Kelopak Bunga', desc: 'Kelopak sakura lembut' },
+                    { id: 'sparkles', label: '✨ Kilau Emas', desc: 'Bintang berkilau lembut' },
+                    { id: 'hearts', label: '❤️ Hati Melayang', desc: 'Ikon hati komik romantis' },
+                    { id: 'custom', label: '🌐 URL Kustom', desc: 'Pakai Link Animasi Sendiri' },
+                  ].map((preset) => {
+                    const isSelected = (formData.globalAmbientType || 'none') === preset.id;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => handleChange('globalAmbientType', preset.id as any)}
+                        className={`p-2.5 rounded-lg border-2 text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-amber-100/80 border-stone-800 shadow-xs'
+                            : 'bg-stone-50 hover:bg-stone-100 border-stone-300 text-stone-700'
+                        }`}
+                      >
+                        <p className="font-bold text-xs text-stone-900">{preset.label}</p>
+                        <p className="text-[10px] text-stone-500 mt-0.5 line-clamp-1">{preset.desc}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Custom URL Input for Global Ambient */}
+                {(formData.globalAmbientType === 'custom' || formData.globalAmbientAnimationUrl) && (
+                  <div className="pt-2 border-t border-stone-200 space-y-2">
+                    <label className="block text-xs font-bold text-stone-700">
+                      Link URL Overlay Animasi Seluruh Undangan (GIF Transparan / Video MP4 Loop)
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.globalAmbientAnimationUrl || ''}
+                      onChange={(e) => handleChange('globalAmbientAnimationUrl', e.target.value)}
+                      placeholder="https://.../falling-leaves.gif atau /overlay.gif"
+                      className="w-full bg-[#fcf9f2] border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs font-mono text-stone-900 outline-hidden"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* 4. Animasi Our Story */}
+              <div className="bg-white border-2 border-stone-800 rounded-xl p-4 space-y-3 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-bold text-sm text-stone-900 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-200 border border-stone-800 flex items-center justify-center text-xs">
+                      4
+                    </span>
+                    <span>Animasi Our Story (Kisah Perjalanan)</span>
+                  </h5>
+                  {formData.ourStoryAnimationUrl && (
+                    <button
+                      type="button"
+                      onClick={() => handleChange('ourStoryAnimationUrl', '')}
+                      className="text-xs text-rose-600 hover:text-rose-800 flex items-center gap-1 font-bold cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Hapus URL</span>
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-stone-600">
+                  Mengganti ilustrasi pasangan duduk di bangku taman dengan animasi GIF atau ilustrasi kustom Anda.
+                </p>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Link URL Animasi Our Story (.gif / .png / .jpg / .webp)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.ourStoryAnimationUrl || ''}
+                    onChange={(e) => handleChange('ourStoryAnimationUrl', e.target.value)}
+                    placeholder="https://.../our-story-animation.gif atau /story.png"
+                    className="w-full bg-[#fcf9f2] border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs font-mono text-stone-900 outline-hidden"
+                  />
+                </div>
+                {formData.ourStoryAnimationUrl && (
+                  <div className="p-2 border border-dashed border-stone-400 rounded-lg bg-stone-50 text-center">
+                    <p className="text-[11px] text-stone-500 mb-1.5 font-bold">Pratinjau Animasi Our Story:</p>
+                    <img
+                      src={formData.ourStoryAnimationUrl}
+                      alt="Pratinjau Our Story"
+                      className="max-h-40 mx-auto object-contain rounded-md border border-stone-300 bg-white"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* 5. Animasi Detail Acara */}
+              <div className="bg-white border-2 border-stone-800 rounded-xl p-4 space-y-3 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-bold text-sm text-stone-900 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-200 border border-stone-800 flex items-center justify-center text-xs">
+                      5
+                    </span>
+                    <span>Animasi Detail Acara (Cincin &amp; Ikon Acara)</span>
+                  </h5>
+                  {formData.eventDetailAnimationUrl && (
+                    <button
+                      type="button"
+                      onClick={() => handleChange('eventDetailAnimationUrl', '')}
+                      className="text-xs text-rose-600 hover:text-rose-800 flex items-center gap-1 font-bold cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Hapus URL</span>
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-stone-600">
+                  Menampilkan animasi GIF cincin kawin, lonceng gereja, atau elemen selebrasi tepat di atas kartu Akad &amp; Resepsi.
+                </p>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Link URL Animasi Acara (.gif / .png / .jpg / .webp)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.eventDetailAnimationUrl || ''}
+                    onChange={(e) => handleChange('eventDetailAnimationUrl', e.target.value)}
+                    placeholder="https://.../wedding-rings.gif atau /animasi-acara.gif"
+                    className="w-full bg-[#fcf9f2] border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs font-mono text-stone-900 outline-hidden"
+                  />
+                </div>
+                {formData.eventDetailAnimationUrl && (
+                  <div className="p-2 border border-dashed border-stone-400 rounded-lg bg-stone-50 text-center">
+                    <p className="text-[11px] text-stone-500 mb-1.5 font-bold">Pratinjau Animasi Detail Acara:</p>
+                    <img
+                      src={formData.eventDetailAnimationUrl}
+                      alt="Pratinjau Detail Acara"
+                      className="max-h-36 mx-auto object-contain rounded-md border border-stone-300 bg-white"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* 6. Animasi Galeri Foto */}
+              <div className="bg-white border-2 border-stone-800 rounded-xl p-4 space-y-3 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-bold text-sm text-stone-900 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-200 border border-stone-800 flex items-center justify-center text-xs">
+                      6
+                    </span>
+                    <span>Animasi Galeri Foto</span>
+                  </h5>
+                  {formData.galleryAnimationUrl && (
+                    <button
+                      type="button"
+                      onClick={() => handleChange('galleryAnimationUrl', '')}
+                      className="text-xs text-rose-600 hover:text-rose-800 flex items-center gap-1 font-bold cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Hapus URL</span>
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-stone-600">
+                  Tampilkan animasi banner bergerak atau GIF kompilasi foto di bagian Galeri Foto Polaroid.
+                </p>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Link URL Animasi Galeri (.gif / .png / .jpg / .webp)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.galleryAnimationUrl || ''}
+                    onChange={(e) => handleChange('galleryAnimationUrl', e.target.value)}
+                    placeholder="https://.../animasi-galeri.gif atau /galeri-banner.gif"
+                    className="w-full bg-[#fcf9f2] border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs font-mono text-stone-900 outline-hidden"
+                  />
+                </div>
+                {formData.galleryAnimationUrl && (
+                  <div className="p-2 border border-dashed border-stone-400 rounded-lg bg-stone-50 text-center">
+                    <p className="text-[11px] text-stone-500 mb-1.5 font-bold">Pratinjau Animasi Galeri Foto:</p>
+                    <img
+                      src={formData.galleryAnimationUrl}
+                      alt="Pratinjau Galeri Foto"
+                      className="max-h-40 mx-auto object-contain rounded-md border border-stone-300 bg-white"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Petunjuk Penggunaan URL & Bahan */}
+              <div className="bg-amber-50/70 border border-amber-300 rounded-lg p-3 text-[11px] text-stone-700 space-y-1.5 leading-relaxed">
+                <p className="font-bold text-stone-900 flex items-center gap-1">
+                  <span>💡</span>
+                  <span>Panduan Memasukkan Bahan &amp; Animasi:</span>
+                </p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>
+                    <strong>Format yang Didukung:</strong> File GIF animasi (<code className="bg-amber-100 px-1 py-0.5 rounded font-mono">.gif</code>), gambar transparan (<code className="bg-amber-100 px-1 py-0.5 rounded font-mono">.png</code>), stiker webp, atau foto (<code className="bg-amber-100 px-1 py-0.5 rounded font-mono">.jpg</code>).
+                  </li>
+                  <li>
+                    <strong>File Lokal di Komputer:</strong> Masukkan file gambar/GIF ke dalam folder <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">public/</code> proyek, lalu ketik link singkatnya (contoh: <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">/animasi.gif</code>).
+                  </li>
+                  <li>
+                    <strong>Hosting Eksternal (Imgur/Giphy/Cloud):</strong> Anda dapat langsung menyalin direct image link (yang berakhiran .gif/.png) dan menempelkannya ke kotak URL.
+                  </li>
+                  <li>
+                    <strong>Ingin Bantuan Memasangkan File?</strong> Anda juga bisa mengirimkan link atau file kepada saya, dan saya akan pasangkan secara otomatis!
+                  </li>
+                </ul>
               </div>
             </div>
           )}

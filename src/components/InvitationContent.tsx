@@ -223,8 +223,18 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2d3136] text-amber-200 border border-stone-800 font-hand font-bold text-[11px] px-3 py-0.5 rounded-full shadow-xs">
                 Mempelai Pria
               </span>
-              <div className="mt-2">
-                <GroomAvatar />
+              <div className="mt-2 flex items-center justify-center">
+                {data.groomAnimationUrl ? (
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-stone-800 overflow-hidden bg-white shadow-xs p-1">
+                    <img
+                      src={data.groomAnimationUrl}
+                      alt={data.groomFullName}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </div>
+                ) : (
+                  <GroomAvatar />
+                )}
               </div>
               <h3 className="font-hand font-extrabold text-xl sm:text-2xl text-stone-900 mt-3">
                 {data.groomFullName}
@@ -250,8 +260,18 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2d3136] text-amber-200 border border-stone-800 font-hand font-bold text-[11px] px-3 py-0.5 rounded-full shadow-xs">
                 Mempelai Wanita
               </span>
-              <div className="mt-2">
-                <BrideAvatar />
+              <div className="mt-2 flex items-center justify-center">
+                {data.brideAnimationUrl ? (
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-stone-800 overflow-hidden bg-white shadow-xs p-1">
+                    <img
+                      src={data.brideAnimationUrl}
+                      alt={data.brideFullName}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </div>
+                ) : (
+                  <BrideAvatar />
+                )}
               </div>
               <h3 className="font-hand font-extrabold text-xl sm:text-2xl text-stone-900 mt-3">
                 {data.brideFullName}
@@ -284,7 +304,18 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
         <section id="section-story" className="my-8 scroll-mt-6">
           <SectionTitle title="OUR STORY" subtitle="Kisah sederhana kami" />
 
-          <CoupleStoryIllustration />
+          {/* 4. Animasi / Bahan Our Story */}
+          {data.ourStoryAnimationUrl ? (
+            <div className="max-w-md mx-auto rounded-xl border-2 border-stone-800 overflow-hidden shadow-xs bg-white p-2">
+              <img
+                src={data.ourStoryAnimationUrl}
+                alt="Animasi Our Story"
+                className="w-full max-h-72 object-contain mx-auto rounded-lg"
+              />
+            </div>
+          ) : (
+            <CoupleStoryIllustration />
+          )}
 
           <div className="text-center mt-5 max-w-md mx-auto bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-4 shadow-xs">
             <h3 className="font-hand font-bold text-xl text-stone-900 mb-1">
@@ -304,6 +335,19 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
         {/* SECTION: DETAIL ACARA */}
         <section id="section-acara" className="my-10 scroll-mt-6">
           <SectionTitle title="DETAIL ACARA" subtitle="Mohon hadir di hari bahagia kami" />
+
+          {/* 5. Animasi / Bahan Detail Acara (Jika diisi) */}
+          {data.eventDetailAnimationUrl && (
+            <div className="flex justify-center mb-4">
+              <div className="max-w-xs rounded-xl border-2 border-stone-800 overflow-hidden shadow-xs bg-white p-2">
+                <img
+                  src={data.eventDetailAnimationUrl}
+                  alt="Animasi Detail Acara"
+                  className="w-full max-h-48 object-contain mx-auto rounded-lg"
+                />
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
             {/* Card 1: Akad Nikah */}
@@ -433,6 +477,18 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
         {/* SECTION: GALERI FOTO */}
         <section id="section-galeri" className="my-10 scroll-mt-6">
           <SectionTitle title="GALERI FOTO" subtitle="Momen-momen indah kami" />
+
+          {/* 6. Animasi / Bahan Galeri Foto (Jika diisi) */}
+          {data.galleryAnimationUrl && (
+            <div className="mb-5 max-w-sm mx-auto rounded-xl border-2 border-stone-800 overflow-hidden shadow-xs bg-white p-2">
+              <img
+                src={data.galleryAnimationUrl}
+                alt="Animasi Galeri Foto"
+                className="w-full max-h-60 object-contain mx-auto rounded-lg"
+              />
+            </div>
+          )}
+
           <PolaroidGallery onSelect={(idx) => setSelectedPhoto(idx)} />
         </section>
 

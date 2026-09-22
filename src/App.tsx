@@ -8,6 +8,7 @@ import { ComicCover } from './components/ComicCover';
 import { InvitationContent } from './components/InvitationContent';
 import { HtmlCodeModal } from './components/HtmlCodeModal';
 import { CustomizerModal } from './components/CustomizerModal';
+import { GlobalAmbientOverlay } from './components/GlobalAmbientOverlay';
 import {
   Code,
   BookOpen,
@@ -158,7 +159,13 @@ export default function App() {
   };
 
   return (
-    <div id="wedding-app" className="min-h-screen bg-[#ece6dc] text-stone-900 flex flex-col antialiased selection:bg-[#dfcdb9]">
+    <div id="wedding-app" className="min-h-screen bg-[#ece6dc] text-stone-900 flex flex-col antialiased selection:bg-[#dfcdb9] relative">
+      {/* 3. Global Ambient Overlay (Leaves, Petals, Sparkles, Hearts, or Custom URL) */}
+      <GlobalAmbientOverlay
+        type={invitationData.globalAmbientType}
+        customUrl={invitationData.globalAmbientAnimationUrl}
+      />
+
       {/* Top Floating Control Bar - HIDDEN IN GUEST MODE */}
       {!isGuestMode && (
         <nav
