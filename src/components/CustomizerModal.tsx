@@ -18,6 +18,10 @@ import {
   Play,
   Pause,
   Volume2,
+  Users,
+  Download,
+  FileSpreadsheet,
+  ExternalLink,
 } from 'lucide-react';
 import { InvitationData, defaultInvitationData } from '../types/invitation';
 import { PRESET_SONGS, SongPreset } from '../utils/audio';
@@ -48,6 +52,61 @@ export function CustomizerModal({
   const [sampleGuestName, setSampleGuestName] = useState('Bapak Budi & Keluarga');
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedWaMessage, setCopiedWaMessage] = useState(false);
+
+  // Bulk Guest Generator state
+  const [guestSubTab, setGuestSubTab] = useState<'bulk' | 'single'>('bulk');
+  const [bulkNamesText, setBulkNamesText] = useState<string>(
+    'Bpk. Suwandi & Keluarga\nIbu Siti Liumi\nKeluarga Besar Bpk. Sardi (alm)\nIbu Yuliani\nTeman-teman Ns. Febri\nRekan Kerja Mas Haris\nDimas & Partner'
+  );
+  const [copiedBulkRowIndex, setCopiedBulkRowIndex] = useState<number | null>(null);
+  const [copiedAllBulk, setCopiedAllBulk] = useState(false);
+
+  const getParsedNames = (): string[] => {
+    return bulkNamesText
+      .split('\n')
+      .map((name) => name.replace(/^[\d\.\-\*\•\)\s]+/, '').trim())
+      .filter((name) => name.length > 0);
+  };
+
+  const getWaText = (guest: string) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const url = `${origin}?to=${encodeURIComponent(guest)}`;
+    return `Kepada Yth. ${guest},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir di acara pernikahan kami:\n\n*${formData.groomName} & ${formData.brideName}*\n📅 ${formData.weddingDateFull}\n📍 ${formData.venueName}\n\nUntuk informasi lengkap acara dan konfirmasi kehadiran, silakan buka tautan undangan berikut:\n${url}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan memberikan doa restu.\n\nTerima kasih.`;
+  };
+
+  const handleCopyAllBulk = () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const names = getParsedNames();
+    const rows = names.map((name, i) => {
+      const url = `${origin}?to=${encodeURIComponent(name)}`;
+      return `${i + 1}\t${name}\t${url}`;
+    });
+    const header = 'No\tNama Tamu\tLink Undangan';
+    const tsv = [header, ...rows].join('\n');
+    navigator.clipboard.writeText(tsv);
+    setCopiedAllBulk(true);
+    setTimeout(() => setCopiedAllBulk(false), 2500);
+  };
+
+  const handleDownloadCsv = () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const names = getParsedNames();
+    const rows = names.map((name, i) => {
+      const url = `${origin}?to=${encodeURIComponent(name)}`;
+      const escapedName = `"${name.replace(/"/g, '""')}"`;
+      const escapedUrl = `"${url.replace(/"/g, '""')}"`;
+      return `${i + 1},${escapedName},${escapedUrl}`;
+    });
+    const header = 'No,Nama Tamu,Link Undangan';
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [header, ...rows].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `daftar-link-undangan-${formData.groomName}-${formData.brideName}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Audio preview state
   const [previewingSongId, setPreviewingSongId] = useState<string | null>(null);
@@ -910,111 +969,308 @@ export function CustomizerModal({
           {/* TAB 7: KIRIM KE TAMU (GUEST MODE & LINKS) */}
           {activeTab === 'tamu' && (
             <div className="space-y-4">
-              <div className="bg-emerald-50 border-2 border-emerald-600/60 rounded-xl p-4 text-emerald-950">
+              {/* Highlight Banner */}
+              <div className="bg-emerald-50 border-2 border-emerald-600/70 rounded-xl p-4 text-emerald-950">
                 <h4 className="font-bold text-sm flex items-center gap-1.5 mb-1 text-emerald-900">
                   <Sparkles className="w-4 h-4 text-emerald-600" />
-                  <span>Fitur Undangan Bersih Khusus Tamu</span>
+                  <span>100% Bersih Khusus Tamu (Tanpa Menu/Tombol Edit)</span>
                 </h4>
                 <p className="text-xs leading-relaxed text-emerald-800">
-                  Saat tamu membuka undangan Anda, mereka akan disuguhkan <strong>tampilan bersih tanpa bilah menu edit atau tombol admin</strong>. Anda juga bisa menyematkan nama tamu secara dinamis di sampul depan!
+                  Tamu yang membuka link undangan Anda <strong>tidak akan melihat menu konfigurasi atau tombol edit apa pun</strong>. Tampilan untuk tamu benar-benar murni, bersih, dan elegan dengan nama mereka tertulis indah di kartu sampul depan.
                 </p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Nama Tamu yang Dituju
-                </label>
-                <input
-                  type="text"
-                  value={sampleGuestName}
-                  onChange={(e) => setSampleGuestName(e.target.value)}
-                  placeholder="Contoh: Bapak Budi & Keluarga"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                />
-                <p className="text-[11px] text-stone-500 mt-1">
-                  Nama ini otomatis dicantumkan di kartu sampul komik (&ldquo;Kepada Yth. Bapak/Ibu/Saudara/i&rdquo;).
-                </p>
-              </div>
-
-              {/* Generated URL Box */}
-              <div className="bg-stone-50 border border-stone-300 rounded-xl p-3.5 space-y-2">
-                <span className="text-xs font-bold text-stone-800 block">
-                  🔗 Link Undangan Tamu (Siap Dibagikan):
-                </span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName)}`}
-                    className="flex-1 bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-800 select-all outline-hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const url = `${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName)}`;
-                      navigator.clipboard.writeText(url);
-                      setCopiedLink(true);
-                      setTimeout(() => setCopiedLink(false), 2000);
-                    }}
-                    className="bg-stone-800 hover:bg-stone-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shrink-0 cursor-pointer"
-                  >
-                    {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedLink ? 'Tersalin!' : 'Salin'}</span>
-                  </button>
+                <div className="mt-2 pt-2 border-t border-emerald-200 text-[11px] text-emerald-800 flex items-center gap-1.5">
+                  <span className="font-bold">🔑 Info Mempelai/Admin:</span>
+                  <span>
+                    Untuk membuka kembali toolbar edit di kemudian hari, cukup tambahkan <code className="bg-emerald-100 px-1 py-0.5 rounded font-mono font-bold text-emerald-900">?admin=true</code> di ujung link web Anda.
+                  </span>
                 </div>
               </div>
 
-              {/* WhatsApp Share Template */}
-              <div className="bg-stone-50 border border-stone-300 rounded-xl p-3.5 space-y-2">
-                <span className="text-xs font-bold text-stone-800 block">
-                  💬 Contoh Pesan WhatsApp Siap Kirim:
-                </span>
-                <div className="bg-white border border-stone-200 rounded-lg p-2.5 text-xs font-sans text-stone-800 leading-relaxed max-h-28 overflow-y-auto whitespace-pre-line">
-                  {`Kepada Yth. ${sampleGuestName || 'Bapak/Ibu/Saudara/i'},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir di acara pernikahan kami:\n\n*${formData.groomName} & ${formData.brideName}*\n📅 ${formData.weddingDateFull}\n📍 ${formData.venueName}\n\nUntuk informasi lengkap acara dan konfirmasi kehadiran, silakan kunjungi tautan undangan berikut:\n${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName || 'Tamu')}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan memberikan doa restu.\n\nTerima kasih.`}
-                </div>
-
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const msg = `Kepada Yth. ${sampleGuestName || 'Bapak/Ibu/Saudara/i'},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir di acara pernikahan kami:\n\n*${formData.groomName} & ${formData.brideName}*\n📅 ${formData.weddingDateFull}\n📍 ${formData.venueName}\n\nUntuk informasi lengkap acara dan konfirmasi kehadiran, silakan kunjungi tautan undangan berikut:\n${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName || 'Tamu')}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan memberikan doa restu.\n\nTerima kasih.`;
-                      navigator.clipboard.writeText(msg);
-                      setCopiedWaMessage(true);
-                      setTimeout(() => setCopiedWaMessage(false), 2000);
-                    }}
-                    className="bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>{copiedWaMessage ? 'Pesan Tersalin!' : 'Salin Teks WhatsApp'}</span>
-                  </button>
-
-                  <a
-                    href={`https://wa.me/?text=${encodeURIComponent(`Kepada Yth. ${sampleGuestName || 'Bapak/Ibu/Saudara/i'},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir di acara pernikahan kami:\n\n*${formData.groomName} & ${formData.brideName}*\n📅 ${formData.weddingDateFull}\n📍 ${formData.venueName}\n\nUntuk informasi lengkap acara dan konfirmasi kehadiran, silakan kunjungi tautan undangan berikut:\n${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName || 'Tamu')}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan memberikan doa restu.\n\nTerima kasih.`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Buka WhatsApp</span>
-                  </a>
-                </div>
+              {/* Sub-Tabs: Massal vs Satuan */}
+              <div className="flex bg-stone-200/80 p-1 rounded-xl gap-1 border border-stone-300">
+                <button
+                  type="button"
+                  onClick={() => setGuestSubTab('bulk')}
+                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-hand font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    guestSubTab === 'bulk'
+                      ? 'bg-stone-900 text-amber-200 shadow-xs'
+                      : 'text-stone-700 hover:text-stone-900 hover:bg-stone-300/50'
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>📋 Buat Link Banyak / Massal Sekaligus ({getParsedNames().length} Tamu)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGuestSubTab('single')}
+                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-hand font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    guestSubTab === 'single'
+                      ? 'bg-stone-900 text-amber-200 shadow-xs'
+                      : 'text-stone-700 hover:text-stone-900 hover:bg-stone-300/50'
+                  }`}
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>👤 Buat 1 Link Satuan</span>
+                </button>
               </div>
 
-              {/* Action: Preview in Guest Mode right now */}
-              {onPreviewGuestMode && (
-                <div className="pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSave(formData);
-                      onPreviewGuestMode(sampleGuestName);
-                      onClose();
-                    }}
-                    className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
-                  >
-                    <Eye className="w-4 h-4" />
-                    <span>Lihat Langsung Versi Tamu Ini (Simulasi Tampilan Tamu)</span>
-                  </button>
+              {/* MODE 1: BULK GUEST GENERATOR (INPUT BANYAK SEKALIGUS) */}
+              {guestSubTab === 'bulk' && (
+                <div className="space-y-3.5">
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-bold text-stone-800 flex items-center gap-1">
+                        <span>Daftar Nama Tamu Undangan</span>
+                        <span className="text-[11px] font-normal text-stone-500">(1 nama per baris)</span>
+                      </label>
+                      <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                        {getParsedNames().length} Tamu Terdeteksi
+                      </span>
+                    </div>
+                    <textarea
+                      rows={5}
+                      value={bulkNamesText}
+                      onChange={(e) => setBulkNamesText(e.target.value)}
+                      placeholder="Tempelkan daftar nama tamu di sini, contoh:&#10;Bpk. Suwandi & Keluarga&#10;Ibu Siti Liumi&#10;dr. Hendra Pratama&#10;Dimas & Partner&#10;Keluarga Besar Bpk. Sardi&#10;Teman-teman Ns. Febri&#10;Rekan Kerja Mas Haris"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-xl p-3 text-xs sm:text-sm font-sans font-medium text-stone-900 outline-hidden leading-relaxed resize-y"
+                    />
+                    <p className="text-[11px] text-stone-500 mt-1">
+                      💡 <em>Tips: Anda bisa langsung copy satu kolom nama dari Excel/Google Sheets atau pesan WhatsApp, lalu paste di sini! Simbol nomor (1., 2., -) otomatis dibersihkan.</em>
+                    </p>
+                  </div>
+
+                  {/* Bulk Actions Header */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 bg-stone-100 border border-stone-300 rounded-xl p-2.5">
+                    <span className="text-xs font-bold text-stone-800 flex items-center gap-1">
+                      <FileSpreadsheet className="w-4 h-4 text-emerald-700" />
+                      <span>Hasil Link Personal Tamu:</span>
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyAllBulk}
+                        className="px-2.5 py-1.5 bg-stone-800 hover:bg-stone-900 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                        title="Salin semua nama dan link (bisa langsung di-paste ke Excel / Google Sheets)"
+                      >
+                        {copiedAllBulk ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Semua Tersalin!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Salin Semua (Untuk Excel)</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleDownloadCsv}
+                        className="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                        title="Download file CSV berisi nama dan link semua tamu"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download CSV</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Bulk Generated List / Table */}
+                  <div className="border border-stone-300 rounded-xl bg-white max-h-72 overflow-y-auto divide-y divide-stone-200">
+                    {getParsedNames().length === 0 ? (
+                      <div className="p-6 text-center text-xs text-stone-500">
+                        Silakan masukkan atau tempelkan nama tamu pada kotak di atas.
+                      </div>
+                    ) : (
+                      getParsedNames().map((name, index) => {
+                        const origin = typeof window !== 'undefined' ? window.location.origin : '';
+                        const guestUrl = `${origin}?to=${encodeURIComponent(name)}`;
+                        const isCopied = copiedBulkRowIndex === index;
+
+                        return (
+                          <div
+                            key={index}
+                            className="p-2.5 sm:p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-amber-50/50 transition-colors"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-5 h-5 rounded-full bg-stone-200 text-stone-700 text-[10px] font-bold flex items-center justify-center shrink-0">
+                                  {index + 1}
+                                </span>
+                                <h5 className="font-hand font-extrabold text-stone-900 text-sm truncate">
+                                  {name}
+                                </h5>
+                              </div>
+                              <p className="text-[11px] text-stone-500 font-mono truncate pl-6">
+                                {guestUrl}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0 pl-6 sm:pl-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(guestUrl);
+                                  setCopiedBulkRowIndex(index);
+                                  setTimeout(() => setCopiedBulkRowIndex(null), 2000);
+                                }}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer border ${
+                                  isCopied
+                                    ? 'bg-emerald-600 text-white border-emerald-700'
+                                    : 'bg-stone-100 hover:bg-stone-200 text-stone-800 border-stone-300'
+                                }`}
+                                title="Salin link tamu ini"
+                              >
+                                {isCopied ? (
+                                  <>
+                                    <Check className="w-3 h-3" />
+                                    <span>Tersalin!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-3 h-3" />
+                                    <span>Salin Link</span>
+                                  </>
+                                )}
+                              </button>
+
+                              <a
+                                href={`https://wa.me/?text=${encodeURIComponent(getWaText(name))}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                                title="Kirim undangan langsung via WhatsApp"
+                              >
+                                <Send className="w-3 h-3" />
+                                <span>Kirim WA</span>
+                              </a>
+
+                              {onPreviewGuestMode && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    onSave(formData);
+                                    onPreviewGuestMode(name);
+                                    onClose();
+                                  }}
+                                  className="p-1 rounded-lg hover:bg-stone-200 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer"
+                                  title={`Simulasi tampilan tamu untuk: ${name}`}
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* MODE 2: SINGLE GUEST LINK (SATUAN) */}
+              {guestSubTab === 'single' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nama Tamu yang Dituju
+                    </label>
+                    <input
+                      type="text"
+                      value={sampleGuestName}
+                      onChange={(e) => setSampleGuestName(e.target.value)}
+                      placeholder="Contoh: Bapak Budi & Keluarga"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
+                    />
+                    <p className="text-[11px] text-stone-500 mt-1">
+                      Nama ini otomatis dicantumkan di kartu sampul komik (&ldquo;Kepada Yth. Bapak/Ibu/Saudara/i&rdquo;).
+                    </p>
+                  </div>
+
+                  {/* Generated URL Box */}
+                  <div className="bg-stone-50 border border-stone-300 rounded-xl p-3.5 space-y-2">
+                    <span className="text-xs font-bold text-stone-800 block">
+                      🔗 Link Undangan Tamu (Siap Dibagikan):
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        readOnly
+                        value={`${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName)}`}
+                        className="flex-1 bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-800 select-all outline-hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const url = `${typeof window !== 'undefined' ? window.location.origin : ''}?to=${encodeURIComponent(sampleGuestName)}`;
+                          navigator.clipboard.writeText(url);
+                          setCopiedLink(true);
+                          setTimeout(() => setCopiedLink(false), 2000);
+                        }}
+                        className="bg-stone-800 hover:bg-stone-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shrink-0 cursor-pointer"
+                      >
+                        {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedLink ? 'Tersalin!' : 'Salin'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* WhatsApp Share Template */}
+                  <div className="bg-stone-50 border border-stone-300 rounded-xl p-3.5 space-y-2">
+                    <span className="text-xs font-bold text-stone-800 block">
+                      💬 Contoh Pesan WhatsApp Siap Kirim:
+                    </span>
+                    <div className="bg-white border border-stone-200 rounded-lg p-2.5 text-xs font-sans text-stone-800 leading-relaxed max-h-28 overflow-y-auto whitespace-pre-line">
+                      {getWaText(sampleGuestName || 'Bapak/Ibu/Saudara/i')}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const msg = getWaText(sampleGuestName || 'Bapak/Ibu/Saudara/i');
+                          navigator.clipboard.writeText(msg);
+                          setCopiedWaMessage(true);
+                          setTimeout(() => setCopiedWaMessage(false), 2000);
+                        }}
+                        className="bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>{copiedWaMessage ? 'Pesan Tersalin!' : 'Salin Teks WhatsApp'}</span>
+                      </button>
+
+                      <a
+                        href={`https://wa.me/?text=${encodeURIComponent(getWaText(sampleGuestName || 'Bapak/Ibu/Saudara/i'))}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Buka WhatsApp</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Action: Preview in Guest Mode right now */}
+                  {onPreviewGuestMode && (
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSave(formData);
+                          onPreviewGuestMode(sampleGuestName);
+                          onClose();
+                        }}
+                        className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+                      >
+                        <Eye className="w-4 h-4" />
+                        <span>Lihat Langsung Versi Tamu Ini (Simulasi Tampilan Tamu)</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

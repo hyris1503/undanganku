@@ -25,22 +25,6 @@ import { weddingAudio } from './utils/audio';
 export default function App() {
   // BY DEFAULT: 100% Clean Guest Mode!
   // Toolbar is completely hidden unless URL has ?edit=true or ?admin=true
-  const [isGuestMode, setIsGuestMode] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('edit') === 'true' || params.get('admin') === 'true') {
-        return false;
-      }
-      try {
-        const saved = localStorage.getItem('wedding_view_mode');
-        if (saved === 'edit') return false;
-      } catch {
-        // Ignore
-      }
-    }
-    return true; // Default: Clean guest view
-  });
-
   const [guestName, setGuestName] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -54,6 +38,35 @@ export default function App() {
       }
     }
     return 'Tamu Undangan';
+  });
+
+  // Track if current session is authenticated as admin/host
+  const [isAdminSession, setIsAdminSession] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('edit') === 'true' || params.get('admin') === 'true') {
+        try {
+          sessionStorage.setItem('wedding_is_admin', 'true');
+        } catch {}
+        return true;
+      }
+      try {
+        return sessionStorage.getItem('wedding_is_admin') === 'true';
+      } catch {}
+    }
+    return false;
+  });
+
+  // BY DEFAULT: 100% Clean Guest Mode!
+  // Toolbar is completely hidden unless URL has ?edit=true or ?admin=true
+  const [isGuestMode, setIsGuestMode] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('edit') === 'true' || params.get('admin') === 'true') {
+        return false;
+      }
+    }
+    return true; // Default: 100% Clean guest view for all recipients
   });
 
   // By default, only show the Cover (Foto 1) so guest has a true invitation opening experience
@@ -308,16 +321,16 @@ export default function App() {
         )}
       </main>
 
-      {/* Discreet Floating Button in Guest Mode to return to Edit Mode (For the host) */}
-      {isGuestMode && (
+      {/* Discreet Floating Button ONLY visible if you entered via ?admin=true / ?edit=true */}
+      {isGuestMode && isAdminSession && (
         <div className="fixed bottom-20 right-3 z-50">
           <button
             onClick={handleExitGuestMode}
-            className="bg-stone-800/80 hover:bg-stone-900 text-stone-300 hover:text-white px-3 py-1.5 rounded-full text-xs font-hand font-bold shadow-lg border border-stone-600/70 backdrop-blur-xs flex items-center gap-1.5 transition-all opacity-60 hover:opacity-100 cursor-pointer"
-            title="Kembali ke Mode Edit (Toolbar Pengaturan)"
+            className="bg-stone-800/80 hover:bg-stone-900 text-stone-300 hover:text-white px-3 py-1.5 rounded-full text-xs font-hand font-bold shadow-lg border border-stone-600/70 backdrop-blur-xs flex items-center gap-1.5 transition-all opacity-70 hover:opacity-100 cursor-pointer"
+            title="Kembali ke Mode Edit (Toolbar Pengaturan Mempelai)"
           >
             <SlidersHorizontal className="w-3.5 h-3.5 text-amber-300" />
-            <span>Mode Edit</span>
+            <span>Mode Edit (Admin)</span>
           </button>
         </div>
       )}
