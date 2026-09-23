@@ -90,222 +90,290 @@ export function SectionTitle({ title, subtitle }: { title: string; subtitle?: st
   );
 }
 
-/** 4-Panel Comic Strip SVG Graphics accurately portraying the scene from Photo 1 */
-export function ComicStrip({ dialogues }: { dialogues?: ComicDialogues }) {
-  const d = dialogues || {
-    panel1: "Eh, kamu tanggal 20 kosong nggak?",
-    panel2: "Kosong sih. Kenapa?",
-    panel3: "Ada acara penting.",
-    panel4: "Nikahan gue.",
-  };
+function getBubblePositionClass(pos?: string) {
+  switch (pos) {
+    case 'top-right':
+      return 'self-end mb-auto';
+    case 'bottom-left':
+      return 'self-start mt-auto';
+    case 'bottom-right':
+      return 'self-end mt-auto';
+    case 'top-left':
+    default:
+      return 'self-start mb-auto';
+  }
+}
+
+function getTailPositionClass(pos?: string) {
+  switch (pos) {
+    case 'top-right':
+      return 'absolute -bottom-2 right-6 w-3 h-3 bg-white border-r-2 border-b-2 border-stone-800 transform rotate-45';
+    case 'bottom-left':
+      return 'absolute -top-2 left-6 w-3 h-3 bg-white border-l-2 border-t-2 border-stone-800 transform rotate-45';
+    case 'bottom-right':
+      return 'absolute -top-2 right-6 w-3 h-3 bg-white border-r-2 border-t-2 border-stone-800 transform rotate-45';
+    case 'top-left':
+    default:
+      return 'absolute -bottom-2 left-6 w-3 h-3 bg-white border-r-2 border-b-2 border-stone-800 transform rotate-45';
+  }
+}
+
+export interface ComicPanelCustomData {
+  imageUrl?: string;
+  text?: string;
+  bubblePos?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+}
+
+export interface ComicStripProps {
+  dialogues?: ComicDialogues;
+  panel1?: ComicPanelCustomData;
+  panel2?: ComicPanelCustomData;
+  panel3?: ComicPanelCustomData;
+  panel4?: ComicPanelCustomData;
+  extraPanels?: Array<{
+    id: string;
+    imageUrl?: string;
+    text?: string;
+    bubblePos?: string;
+  }>;
+}
+
+/** 4-Panel Comic Strip SVG Graphics with full custom photo/illustration & position support */
+export function ComicStrip({ dialogues, panel1, panel2, panel3, panel4, extraPanels }: ComicStripProps) {
+  const p1Text = panel1?.text ?? dialogues?.panel1 ?? "munduran dikit bisa mba?";
+  const p1Image = panel1?.imageUrl;
+  const p1Pos = panel1?.bubblePos || 'top-left';
+
+  const p2Text = panel2?.text ?? dialogues?.panel2 ?? "iya Kenapa mas?";
+  const p2Image = panel2?.imageUrl;
+  const p2Pos = panel2?.bubblePos || 'top-right';
+
+  const p3Text = panel3?.text ?? dialogues?.panel3 ?? "cantik e kelewatan.";
+  const p3Image = panel3?.imageUrl;
+  const p3Pos = panel3?.bubblePos || 'top-left';
+
+  const p4Text = panel4?.text ?? dialogues?.panel4 ?? "Nikah yuk mas.";
+  const p4Image = panel4?.imageUrl;
+  const p4Pos = panel4?.bubblePos || 'top-right';
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-stone-900/5 rounded-xl border-2 border-stone-800">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 p-3.5 bg-stone-900/5 rounded-2xl border-2 border-stone-800 shadow-[3px_4px_0px_#231f1d]">
       {/* Panel 1 */}
-      <div className="relative bg-[#fdfbf7] border-2 border-stone-800 rounded-lg overflow-hidden p-3 aspect-4/3 flex flex-col justify-between shadow-xs">
+      <div className="relative bg-[#fdfbf7] border-2 border-stone-800 rounded-xl overflow-hidden p-3 aspect-4/3 flex flex-col justify-between shadow-xs group">
+        {p1Image ? (
+          <div className="absolute inset-0 w-full h-full">
+            <img src={p1Image} alt="Panel 1" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <div className="absolute inset-0 bg-stone-900/10 pointer-events-none" />
+          </div>
+        ) : null}
+
         {/* Dialogue Bubble */}
-        <div className="self-start relative bg-white border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 max-w-[80%] shadow-xs z-10">
+        <div className={`${getBubblePositionClass(p1Pos)} relative bg-white/95 backdrop-blur-xs border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 max-w-[85%] shadow-[2px_3px_0px_#231f1d] z-10`}>
           <p className="font-hand text-sm md:text-base font-bold text-stone-900 leading-snug">
-            {d.panel1}
+            {p1Text}
           </p>
-          <div className="absolute -bottom-2 left-6 w-3 h-3 bg-white border-r-2 border-b-2 border-stone-800 transform rotate-45"></div>
+          <div className={getTailPositionClass(p1Pos)}></div>
         </div>
 
-        {/* Characters Panel 1 */}
-        <svg viewBox="0 0 300 180" className="w-full h-auto mt-auto">
-          {/* Background wall & window */}
-          <rect x="0" y="0" width="300" height="180" fill="#f8f5ee" />
-          <rect x="150" y="10" width="60" height="90" fill="#e5dfd2" stroke="#444" strokeWidth="2" rx="2" />
-          <path d="M150 55 L210 55 M180 10 L180 100" stroke="#444" strokeWidth="2" />
-          {/* Plant leaves */}
-          <path d="M10 80 Q25 40 15 20 Q5 50 10 80" fill="#889d7d" stroke="#333" strokeWidth="1.5" />
-          <path d="M20 90 Q40 60 45 40 Q30 70 20 90" fill="#98ad8d" stroke="#333" strokeWidth="1.5" />
+        {/* Characters Panel 1 (rendered only if no custom image) */}
+        {!p1Image && (
+          <svg viewBox="0 0 300 180" className="w-full h-auto mt-auto">
+            <rect x="0" y="0" width="300" height="180" fill="#f8f5ee" />
+            <rect x="150" y="10" width="60" height="90" fill="#e5dfd2" stroke="#444" strokeWidth="2" rx="2" />
+            <path d="M150 55 L210 55 M180 10 L180 100" stroke="#444" strokeWidth="2" />
+            <path d="M10 80 Q25 40 15 20 Q5 50 10 80" fill="#889d7d" stroke="#333" strokeWidth="1.5" />
+            <path d="M20 90 Q40 60 45 40 Q30 70 20 90" fill="#98ad8d" stroke="#333" strokeWidth="1.5" />
+            <rect x="0" y="145" width="300" height="35" fill="#d9cfbe" stroke="#333" strokeWidth="2" />
+            <rect x="135" y="115" width="22" height="32" rx="3" fill="#ffffff" stroke="#333" strokeWidth="2" />
+            <rect x="138" y="125" width="16" height="19" fill="#c49b66" opacity="0.8" />
+            <line x1="144" y1="100" x2="140" y2="128" stroke="#333" strokeWidth="2.5" strokeLinecap="round" />
+            <rect x="175" y="122" width="22" height="25" rx="3" fill="#ffffff" stroke="#333" strokeWidth="2" />
 
-          {/* Table */}
-          <rect x="0" y="145" width="300" height="35" fill="#d9cfbe" stroke="#333" strokeWidth="2" />
-          {/* Glass / iced coffee */}
-          <rect x="135" y="115" width="22" height="32" rx="3" fill="#ffffff" stroke="#333" strokeWidth="2" />
-          <rect x="138" y="125" width="16" height="19" fill="#c49b66" opacity="0.8" />
-          <line x1="144" y1="100" x2="140" y2="128" stroke="#333" strokeWidth="2.5" strokeLinecap="round" />
-          {/* Second cup */}
-          <rect x="175" y="122" width="22" height="25" rx="3" fill="#ffffff" stroke="#333" strokeWidth="2" />
+            <g transform="translate(10, 20)">
+              <path d="M20 150 C20 105 50 95 85 95 C120 95 140 105 140 150 Z" fill="#2d3136" stroke="#222" strokeWidth="2.5" />
+              <rect x="85" y="110" width="20" height="32" rx="4" fill="#1e2024" stroke="#222" strokeWidth="2" transform="rotate(-10 95 125)" />
+              <ellipse cx="80" cy="130" rx="10" ry="8" fill="#ffd5be" stroke="#222" strokeWidth="2" />
+              <rect x="65" y="80" width="20" height="25" fill="#ffd5be" stroke="#222" strokeWidth="2" />
+              <ellipse cx="75" cy="65" rx="32" ry="30" fill="#ffd5be" stroke="#222" strokeWidth="2.5" />
+              <path d="M42 62 C38 40 55 25 80 25 C105 25 115 45 110 70 C108 55 98 48 88 48 C78 48 70 58 60 52 C50 56 46 65 42 62 Z" fill="#282220" stroke="#222" strokeWidth="2.5" />
+              <circle cx="68" cy="66" r="3.5" fill="#222" />
+              <circle cx="88" cy="66" r="3.5" fill="#222" />
+              <circle cx="60" cy="74" r="5" fill="#ffb4a2" opacity="0.6" />
+              <circle cx="95" cy="74" r="5" fill="#ffb4a2" opacity="0.6" />
+              <path d="M74 74 Q78 78 82 74" stroke="#222" strokeWidth="2" fill="none" strokeLinecap="round" />
+              <path d="M64 58 Q70 56 74 58" stroke="#222" strokeWidth="1.8" fill="none" />
+              <path d="M84 58 Q88 56 94 58" stroke="#222" strokeWidth="1.8" fill="none" />
+            </g>
 
-          {/* Andi (Left Guy) */}
-          <g transform="translate(10, 20)">
-            {/* Body */}
-            <path d="M20 150 C20 105 50 95 85 95 C120 95 140 105 140 150 Z" fill="#2d3136" stroke="#222" strokeWidth="2.5" />
-            {/* Hand holding phone */}
-            <rect x="85" y="110" width="20" height="32" rx="4" fill="#1e2024" stroke="#222" strokeWidth="2" transform="rotate(-10 95 125)" />
-            <ellipse cx="80" cy="130" rx="10" ry="8" fill="#ffd5be" stroke="#222" strokeWidth="2" />
-            {/* Neck & Face */}
-            <rect x="65" y="80" width="20" height="25" fill="#ffd5be" stroke="#222" strokeWidth="2" />
-            <ellipse cx="75" cy="65" rx="32" ry="30" fill="#ffd5be" stroke="#222" strokeWidth="2.5" />
-            {/* Hair */}
-            <path d="M42 62 C38 40 55 25 80 25 C105 25 115 45 110 70 C108 55 98 48 88 48 C78 48 70 58 60 52 C50 56 46 65 42 62 Z" fill="#282220" stroke="#222" strokeWidth="2.5" />
-            {/* Eyes, blush, mouth */}
-            <circle cx="68" cy="66" r="3.5" fill="#222" />
-            <circle cx="88" cy="66" r="3.5" fill="#222" />
-            <circle cx="60" cy="74" r="5" fill="#ffb4a2" opacity="0.6" />
-            <circle cx="95" cy="74" r="5" fill="#ffb4a2" opacity="0.6" />
-            <path d="M74 74 Q78 78 82 74" stroke="#222" strokeWidth="2" fill="none" strokeLinecap="round" />
-            <path d="M64 58 Q70 56 74 58" stroke="#222" strokeWidth="1.8" fill="none" />
-            <path d="M84 58 Q88 56 94 58" stroke="#222" strokeWidth="1.8" fill="none" />
-          </g>
-
-          {/* Sinta (Right Girl) */}
-          <g transform="translate(145, 25)">
-            {/* Body (Cream sweater) */}
-            <path d="M45 145 C45 105 70 95 100 95 C130 95 150 105 150 145 Z" fill="#f5eee6" stroke="#222" strokeWidth="2.5" />
-            {/* Neck & Face */}
-            <rect x="88" y="80" width="18" height="22" fill="#ffe0cf" stroke="#222" strokeWidth="2" />
-            <ellipse cx="96" cy="68" rx="28" ry="26" fill="#ffe0cf" stroke="#222" strokeWidth="2.5" />
-            {/* Hair (Brown bob with bangs) */}
-            <path d="M66 65 C64 35 80 28 105 28 C130 28 138 42 135 85 C125 90 120 75 120 60 C110 50 90 50 82 60 C76 68 70 85 66 65 Z" fill="#4d3326" stroke="#222" strokeWidth="2.5" />
-            <circle cx="86" cy="68" r="3.5" fill="#222" />
-            <circle cx="104" cy="68" r="3.5" fill="#222" />
-            <circle cx="80" cy="74" r="4.5" fill="#ffb4a2" opacity="0.6" />
-            <circle cx="110" cy="74" r="4.5" fill="#ffb4a2" opacity="0.6" />
-            <path d="M92 75 Q96 78 100 75" stroke="#222" strokeWidth="1.8" fill="none" strokeLinecap="round" />
-            {/* Arms on table holding cup */}
-            <path d="M60 140 Q85 130 105 132" stroke="#222" strokeWidth="2.5" fill="none" />
-          </g>
-        </svg>
+            <g transform="translate(145, 25)">
+              <path d="M45 145 C45 105 70 95 100 95 C130 95 150 105 150 145 Z" fill="#f5eee6" stroke="#222" strokeWidth="2.5" />
+              <rect x="88" y="80" width="18" height="22" fill="#ffe0cf" stroke="#222" strokeWidth="2" />
+              <ellipse cx="96" cy="68" rx="28" ry="26" fill="#ffe0cf" stroke="#222" strokeWidth="2.5" />
+              <path d="M66 65 C64 35 80 28 105 28 C130 28 138 42 135 85 C125 90 120 75 120 60 C110 50 90 50 82 60 C76 68 70 85 66 65 Z" fill="#4d3326" stroke="#222" strokeWidth="2.5" />
+              <circle cx="86" cy="68" r="3.5" fill="#222" />
+              <circle cx="104" cy="68" r="3.5" fill="#222" />
+              <circle cx="80" cy="74" r="4.5" fill="#ffb4a2" opacity="0.6" />
+              <circle cx="110" cy="74" r="4.5" fill="#ffb4a2" opacity="0.6" />
+              <path d="M92 75 Q96 78 100 75" stroke="#222" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+              <path d="M60 140 Q85 130 105 132" stroke="#222" strokeWidth="2.5" fill="none" />
+            </g>
+          </svg>
+        )}
       </div>
 
       {/* Panel 2 */}
-      <div className="relative bg-[#fdfbf7] border-2 border-stone-800 rounded-lg overflow-hidden p-3 aspect-4/3 flex flex-col justify-between shadow-xs">
+      <div className="relative bg-[#fdfbf7] border-2 border-stone-800 rounded-xl overflow-hidden p-3 aspect-4/3 flex flex-col justify-between shadow-xs group">
+        {p2Image ? (
+          <div className="absolute inset-0 w-full h-full">
+            <img src={p2Image} alt="Panel 2" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <div className="absolute inset-0 bg-stone-900/10 pointer-events-none" />
+          </div>
+        ) : null}
+
         {/* Dialogue Bubble */}
-        <div className="self-start relative bg-white border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 max-w-[80%] shadow-xs z-10">
+        <div className={`${getBubblePositionClass(p2Pos)} relative bg-white/95 backdrop-blur-xs border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 max-w-[85%] shadow-[2px_3px_0px_#231f1d] z-10`}>
           <p className="font-hand text-sm md:text-base font-bold text-stone-900 leading-snug">
-            {d.panel2}
+            {p2Text}
           </p>
-          <div className="absolute -bottom-2 left-6 w-3 h-3 bg-white border-r-2 border-b-2 border-stone-800 transform rotate-45"></div>
+          <div className={getTailPositionClass(p2Pos)}></div>
         </div>
 
-        {/* Sinta Close-up Panel 2 */}
-        <svg viewBox="0 0 300 180" className="w-full h-auto mt-auto">
-          <rect x="0" y="0" width="300" height="180" fill="#f8f5ee" />
-          {/* Leaves background */}
-          <path d="M260 90 Q290 60 295 20 Q270 50 260 90" fill="#889d7d" stroke="#333" strokeWidth="1.5" />
-
-          {/* Sinta zoomed in */}
-          <g transform="translate(45, 10)">
-            {/* Body */}
-            <path d="M30 170 C30 120 70 110 110 110 C150 110 180 120 185 170 Z" fill="#f5eee6" stroke="#222" strokeWidth="2.5" />
-            {/* Neck */}
-            <rect x="96" y="92" width="26" height="30" fill="#ffe0cf" stroke="#222" strokeWidth="2" />
-            {/* Face */}
-            <ellipse cx="108" cy="74" rx="42" ry="38" fill="#ffe0cf" stroke="#222" strokeWidth="2.5" />
-            {/* Hair */}
-            <path d="M60 75 C58 30 85 20 120 20 C155 20 165 40 162 105 C150 110 144 85 144 70 C130 54 100 54 90 68 C80 80 72 105 60 75 Z" fill="#4d3326" stroke="#222" strokeWidth="2.5" />
-            {/* Inquisitive large eyes */}
-            <circle cx="94" cy="72" r="6" fill="#222" />
-            <circle cx="92" cy="70" r="2" fill="#fff" />
-            <circle cx="124" cy="72" r="6" fill="#222" />
-            <circle cx="122" cy="70" r="2" fill="#fff" />
-            {/* Curious Eyebrows */}
-            <path d="M86 60 Q94 54 102 60" stroke="#222" strokeWidth="2" fill="none" />
-            <path d="M118 60 Q126 56 134 62" stroke="#222" strokeWidth="2" fill="none" />
-            {/* Blush */}
-            <circle cx="84" cy="82" r="6" fill="#ffb4a2" opacity="0.6" />
-            <circle cx="132" cy="82" r="6" fill="#ffb4a2" opacity="0.6" />
-            {/* Small open curious mouth */}
-            <path d="M104 84 Q108 90 114 84 Z" fill="#d97a68" stroke="#222" strokeWidth="1.8" />
-          </g>
-        </svg>
+        {!p2Image && (
+          <svg viewBox="0 0 300 180" className="w-full h-auto mt-auto">
+            <rect x="0" y="0" width="300" height="180" fill="#f8f5ee" />
+            <path d="M260 90 Q290 60 295 20 Q270 50 260 90" fill="#889d7d" stroke="#333" strokeWidth="1.5" />
+            <g transform="translate(45, 10)">
+              <path d="M30 170 C30 120 70 110 110 110 C150 110 180 120 185 170 Z" fill="#f5eee6" stroke="#222" strokeWidth="2.5" />
+              <rect x="96" y="92" width="26" height="30" fill="#ffe0cf" stroke="#222" strokeWidth="2" />
+              <ellipse cx="108" cy="74" rx="42" ry="38" fill="#ffe0cf" stroke="#222" strokeWidth="2.5" />
+              <path d="M60 75 C58 30 85 20 120 20 C155 20 165 40 162 105 C150 110 144 85 144 70 C130 54 100 54 90 68 C80 80 72 105 60 75 Z" fill="#4d3326" stroke="#222" strokeWidth="2.5" />
+              <circle cx="94" cy="72" r="6" fill="#222" />
+              <circle cx="92" cy="70" r="2" fill="#fff" />
+              <circle cx="124" cy="72" r="6" fill="#222" />
+              <circle cx="122" cy="70" r="2" fill="#fff" />
+              <path d="M86 60 Q94 54 102 60" stroke="#222" strokeWidth="2" fill="none" />
+              <path d="M118 60 Q126 56 134 62" stroke="#222" strokeWidth="2" fill="none" />
+              <circle cx="84" cy="82" r="6" fill="#ffb4a2" opacity="0.6" />
+              <circle cx="132" cy="82" r="6" fill="#ffb4a2" opacity="0.6" />
+              <path d="M104 84 Q108 90 114 84 Z" fill="#d97a68" stroke="#222" strokeWidth="1.8" />
+            </g>
+          </svg>
+        )}
       </div>
 
       {/* Panel 3 */}
-      <div className="relative bg-[#fdfbf7] border-2 border-stone-800 rounded-lg overflow-hidden p-3 aspect-4/3 flex flex-col justify-between shadow-xs">
+      <div className="relative bg-[#fdfbf7] border-2 border-stone-800 rounded-xl overflow-hidden p-3 aspect-4/3 flex flex-col justify-between shadow-xs group">
+        {p3Image ? (
+          <div className="absolute inset-0 w-full h-full">
+            <img src={p3Image} alt="Panel 3" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <div className="absolute inset-0 bg-stone-900/10 pointer-events-none" />
+          </div>
+        ) : null}
+
         {/* Dialogue Bubble */}
-        <div className="self-start relative bg-white border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 max-w-[80%] shadow-xs z-10">
+        <div className={`${getBubblePositionClass(p3Pos)} relative bg-white/95 backdrop-blur-xs border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 max-w-[85%] shadow-[2px_3px_0px_#231f1d] z-10`}>
           <p className="font-hand text-sm md:text-base font-bold text-stone-900 leading-snug">
-            {d.panel3}
+            {p3Text}
           </p>
-          <div className="absolute -bottom-2 left-6 w-3 h-3 bg-white border-r-2 border-b-2 border-stone-800 transform rotate-45"></div>
+          <div className={getTailPositionClass(p3Pos)}></div>
         </div>
 
-        {/* Andi smiling Panel 3 */}
-        <svg viewBox="0 0 300 180" className="w-full h-auto mt-auto">
-          <rect x="0" y="0" width="300" height="180" fill="#f8f5ee" />
-          <path d="M20 90 Q35 50 30 20 Q15 60 20 90" fill="#889d7d" stroke="#333" strokeWidth="1.5" />
-
-          {/* Action lines */}
-          <line x1="220" y1="70" x2="235" y2="68" stroke="#222" strokeWidth="2" strokeLinecap="round" />
-          <line x1="220" y1="85" x2="238" y2="88" stroke="#222" strokeWidth="2" strokeLinecap="round" />
-
-          {/* Andi Close-up */}
-          <g transform="translate(45, 10)">
-            <path d="M25 170 C25 120 65 110 110 110 C155 110 185 120 185 170 Z" fill="#2d3136" stroke="#222" strokeWidth="2.5" />
-            {/* Phone in hand */}
-            <rect x="130" y="115" width="25" height="42" rx="4" fill="#1e2024" stroke="#222" strokeWidth="2" transform="rotate(-15 140 135)" />
-            <ellipse cx="120" cy="140" rx="14" ry="10" fill="#ffd5be" stroke="#222" strokeWidth="2" />
-            {/* Neck & Face */}
-            <rect x="96" y="90" width="28" height="28" fill="#ffd5be" stroke="#222" strokeWidth="2" />
-            <ellipse cx="110" cy="72" rx="44" ry="40" fill="#ffd5be" stroke="#222" strokeWidth="2.5" />
-            {/* Hair */}
-            <path d="M65 65 C60 30 85 15 120 15 C155 15 168 38 162 75 C158 52 144 45 130 45 C116 45 106 58 92 50 C78 55 72 68 65 65 Z" fill="#282220" stroke="#222" strokeWidth="2.5" />
-            {/* Happy eyes */}
-            <circle cx="94" cy="70" r="5" fill="#222" />
-            <circle cx="126" cy="70" r="5" fill="#222" />
-            <circle cx="84" cy="80" r="6" fill="#ffb4a2" opacity="0.6" />
-            <circle cx="134" cy="80" r="6" fill="#ffb4a2" opacity="0.6" />
-            {/* Confident happy smile */}
-            <path d="M102 80 Q110 92 118 80 Z" fill="#d97a68" stroke="#222" strokeWidth="2" />
-          </g>
-        </svg>
+        {!p3Image && (
+          <svg viewBox="0 0 300 180" className="w-full h-auto mt-auto">
+            <rect x="0" y="0" width="300" height="180" fill="#f8f5ee" />
+            <path d="M20 90 Q35 50 30 20 Q15 60 20 90" fill="#889d7d" stroke="#333" strokeWidth="1.5" />
+            <line x1="220" y1="70" x2="235" y2="68" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+            <line x1="220" y1="85" x2="238" y2="88" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+            <g transform="translate(45, 10)">
+              <path d="M25 170 C25 120 65 110 110 110 C155 110 185 120 185 170 Z" fill="#2d3136" stroke="#222" strokeWidth="2.5" />
+              <rect x="130" y="115" width="25" height="42" rx="4" fill="#1e2024" stroke="#222" strokeWidth="2" transform="rotate(-15 140 135)" />
+              <ellipse cx="120" cy="140" rx="14" ry="10" fill="#ffd5be" stroke="#222" strokeWidth="2" />
+              <rect x="96" y="90" width="28" height="28" fill="#ffd5be" stroke="#222" strokeWidth="2" />
+              <ellipse cx="110" cy="72" rx="44" ry="40" fill="#ffd5be" stroke="#222" strokeWidth="2.5" />
+              <path d="M65 65 C60 30 85 15 120 15 C155 15 168 38 162 75 C158 52 144 45 130 45 C116 45 106 58 92 50 C78 55 72 68 65 65 Z" fill="#282220" stroke="#222" strokeWidth="2.5" />
+              <circle cx="94" cy="70" r="5" fill="#222" />
+              <circle cx="126" cy="70" r="5" fill="#222" />
+              <circle cx="84" cy="80" r="6" fill="#ffb4a2" opacity="0.6" />
+              <circle cx="134" cy="80" r="6" fill="#ffb4a2" opacity="0.6" />
+              <path d="M102 80 Q110 92 118 80 Z" fill="#d97a68" stroke="#222" strokeWidth="2" />
+            </g>
+          </svg>
+        )}
       </div>
 
       {/* Panel 4 */}
-      <div className="relative bg-[#fdfbf7] border-2 border-stone-800 rounded-lg overflow-hidden p-3 aspect-4/3 flex flex-col justify-between shadow-xs">
-        {/* Dialogue Bubbles */}
-        <div className="flex flex-col gap-1 z-10">
-          <div className="self-start relative bg-white border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 max-w-[80%] shadow-xs">
-            <p className="font-hand text-sm md:text-base font-bold text-stone-900 leading-snug">
-              {d.panel4}
-            </p>
-            <div className="absolute -bottom-2 left-6 w-3 h-3 bg-white border-r-2 border-b-2 border-stone-800 transform rotate-45"></div>
+      <div className="relative bg-[#fdfbf7] border-2 border-stone-800 rounded-xl overflow-hidden p-3 aspect-4/3 flex flex-col justify-between shadow-xs group">
+        {p4Image ? (
+          <div className="absolute inset-0 w-full h-full">
+            <img src={p4Image} alt="Panel 4" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <div className="absolute inset-0 bg-stone-900/10 pointer-events-none" />
           </div>
+        ) : null}
+
+        {/* Dialogue Bubble */}
+        <div className={`${getBubblePositionClass(p4Pos)} relative bg-white/95 backdrop-blur-xs border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 max-w-[85%] shadow-[2px_3px_0px_#231f1d] z-10`}>
+          <p className="font-hand text-sm md:text-base font-bold text-stone-900 leading-snug">
+            {p4Text}
+          </p>
+          <div className={getTailPositionClass(p4Pos)}></div>
         </div>
 
-        {/* Sinta Shocked Face Panel 4 */}
-        <svg viewBox="0 0 300 180" className="w-full h-auto mt-auto">
-          <rect x="0" y="0" width="300" height="180" fill="#f8f5ee" />
-
-          {/* Surprise shock hatch lines */}
-          <line x1="20" y1="40" x2="35" y2="48" stroke="#222" strokeWidth="2" strokeLinecap="round" />
-          <line x1="18" y1="58" x2="32" y2="60" stroke="#222" strokeWidth="2" strokeLinecap="round" />
-          <line x1="265" y1="40" x2="250" y2="48" stroke="#222" strokeWidth="2" strokeLinecap="round" />
-          <line x1="268" y1="58" x2="252" y2="60" stroke="#222" strokeWidth="2" strokeLinecap="round" />
-
-          {/* Shocked Sinta */}
-          <g transform="translate(50, 10)">
-            {/* Body */}
-            <path d="M30 170 C30 125 70 115 100 115 C130 115 170 125 170 170 Z" fill="#f5eee6" stroke="#222" strokeWidth="2.5" />
-            {/* Neck & Face */}
-            <rect x="88" y="90" width="24" height="26" fill="#ffe0cf" stroke="#222" strokeWidth="2" />
-            <ellipse cx="100" cy="70" rx="42" ry="38" fill="#ffe0cf" stroke="#222" strokeWidth="2.5" />
-            {/* Hair */}
-            <path d="M56 70 C54 28 80 18 112 18 C145 18 155 38 152 105 C140 110 134 85 134 70 C120 54 90 54 80 68 C72 80 66 105 56 70 Z" fill="#4d3326" stroke="#222" strokeWidth="2.5" />
-
-            {/* Big Shocked Eyes (White + small black dot) */}
-            <circle cx="84" cy="65" r="11" fill="#ffffff" stroke="#222" strokeWidth="2.5" />
-            <circle cx="84" cy="65" r="3.5" fill="#222" />
-            <circle cx="116" cy="65" r="11" fill="#ffffff" stroke="#222" strokeWidth="2.5" />
-            <circle cx="116" cy="65" r="3.5" fill="#222" />
-
-            {/* Raised Eyebrows */}
-            <path d="M74 48 Q84 44 94 48" stroke="#222" strokeWidth="2" fill="none" />
-            <path d="M106 48 Q116 44 126 48" stroke="#222" strokeWidth="2" fill="none" />
-
-            {/* Hands covering mouth in astonishment */}
-            <path d="M76 130 C75 100 78 88 88 84 C95 80 100 90 100 105" fill="#ffe0cf" stroke="#222" strokeWidth="2.2" />
-            <path d="M124 130 C125 100 122 88 112 84 C105 80 100 90 100 105" fill="#ffe0cf" stroke="#222" strokeWidth="2.2" />
-            {/* Finger lines */}
-            <path d="M86 86 L86 104 M92 85 L92 106 M108 85 L108 106 M114 86 L114 104" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
-          </g>
-        </svg>
+        {!p4Image && (
+          <svg viewBox="0 0 300 180" className="w-full h-auto mt-auto">
+            <rect x="0" y="0" width="300" height="180" fill="#f8f5ee" />
+            <line x1="20" y1="40" x2="35" y2="48" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+            <line x1="18" y1="58" x2="32" y2="60" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+            <line x1="265" y1="40" x2="250" y2="48" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+            <line x1="268" y1="58" x2="252" y2="60" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+            <g transform="translate(50, 10)">
+              <path d="M30 170 C30 125 70 115 100 115 C130 115 170 125 170 170 Z" fill="#f5eee6" stroke="#222" strokeWidth="2.5" />
+              <rect x="88" y="90" width="24" height="26" fill="#ffe0cf" stroke="#222" strokeWidth="2" />
+              <ellipse cx="100" cy="70" rx="42" ry="38" fill="#ffe0cf" stroke="#222" strokeWidth="2.5" />
+              <path d="M56 70 C54 28 80 18 112 18 C145 18 155 38 152 105 C140 110 134 85 134 70 C120 54 90 54 80 68 C72 80 66 105 56 70 Z" fill="#4d3326" stroke="#222" strokeWidth="2.5" />
+              <circle cx="84" cy="65" r="11" fill="#ffffff" stroke="#222" strokeWidth="2.5" />
+              <circle cx="84" cy="65" r="3.5" fill="#222" />
+              <circle cx="116" cy="65" r="11" fill="#ffffff" stroke="#222" strokeWidth="2.5" />
+              <circle cx="116" cy="65" r="3.5" fill="#222" />
+              <path d="M74 48 Q84 44 94 48" stroke="#222" strokeWidth="2" fill="none" />
+              <path d="M106 48 Q116 44 126 48" stroke="#222" strokeWidth="2" fill="none" />
+              <path d="M76 130 C75 100 78 88 88 84 C95 80 100 90 100 105" fill="#ffe0cf" stroke="#222" strokeWidth="2.2" />
+              <path d="M124 130 C125 100 122 88 112 84 C105 80 100 90 100 105" fill="#ffe0cf" stroke="#222" strokeWidth="2.2" />
+              <path d="M86 86 L86 104 M92 85 L92 106 M108 85 L108 106 M114 86 L114 104" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
+            </g>
+          </svg>
+        )}
       </div>
+
+      {/* Extra Added Panels (if user added more items) */}
+      {extraPanels && extraPanels.length > 0 && extraPanels.map((extra, idx) => {
+        const extraPos = (extra.bubblePos as any) || (idx % 2 === 0 ? 'top-left' : 'top-right');
+        return (
+          <div
+            key={extra.id || idx}
+            className="relative bg-[#fdfbf7] border-2 border-stone-800 rounded-xl overflow-hidden p-3 aspect-4/3 flex flex-col justify-between shadow-xs group"
+          >
+            {extra.imageUrl ? (
+              <div className="absolute inset-0 w-full h-full">
+                <img src={extra.imageUrl} alt={`Panel ${idx + 5}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-stone-900/10 pointer-events-none" />
+              </div>
+            ) : (
+              <div className="absolute inset-0 bg-amber-50/50 flex items-center justify-center p-4 text-center">
+                <span className="font-hand text-stone-400 text-sm">Panel Tambahan #{idx + 5}</span>
+              </div>
+            )}
+
+            {extra.text && (
+              <div className={`${getBubblePositionClass(extraPos)} relative bg-white/95 backdrop-blur-xs border-2 border-stone-800 rounded-2xl px-3.5 py-1.5 max-w-[85%] shadow-[2px_3px_0px_#231f1d] z-10`}>
+                <p className="font-hand text-sm md:text-base font-bold text-stone-900 leading-snug">
+                  {extra.text}
+                </p>
+                <div className={getTailPositionClass(extraPos)}></div>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

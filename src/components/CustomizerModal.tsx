@@ -804,11 +804,11 @@ export function CustomizerModal({
                 </div>
               </div>
 
-              {/* Resepsi */}
+              {/* Resepsi di Mempelai Wanita */}
               <div className="bg-rose-50/50 p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
                 <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
                   <span>🎉</span>
-                  <span>Acara 2: Resepsi Pernikahan</span>
+                  <span>Acara 2: Resepsi di Mempelai Wanita</span>
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -818,9 +818,12 @@ export function CustomizerModal({
                     </label>
                     <input
                       type="text"
-                      value={formData.resepsiTitle || 'Resepsi Pernikahan'}
-                      onChange={(e) => handleChange('resepsiTitle', e.target.value)}
-                      placeholder="Contoh: Resepsi Pernikahan"
+                      value={formData.resepsiWanitaTitle || formData.resepsiTitle || 'Resepsi di Mempelai Wanita'}
+                      onChange={(e) => {
+                        handleChange('resepsiWanitaTitle', e.target.value);
+                        handleChange('resepsiTitle', e.target.value);
+                      }}
+                      placeholder="Contoh: Resepsi di Mempelai Wanita"
                       className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
                     />
                   </div>
@@ -830,8 +833,11 @@ export function CustomizerModal({
                     </label>
                     <input
                       type="text"
-                      value={formData.resepsiDate || formData.weddingDateFull}
-                      onChange={(e) => handleChange('resepsiDate', e.target.value)}
+                      value={formData.resepsiWanitaDate || formData.resepsiDate || formData.weddingDateFull}
+                      onChange={(e) => {
+                        handleChange('resepsiWanitaDate', e.target.value);
+                        handleChange('resepsiDate', e.target.value);
+                      }}
                       placeholder="Contoh: Minggu, 20 Desember 2026"
                       className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
                     />
@@ -842,8 +848,11 @@ export function CustomizerModal({
                     </label>
                     <input
                       type="text"
-                      value={formData.resepsiTime}
-                      onChange={(e) => handleChange('resepsiTime', e.target.value)}
+                      value={formData.resepsiWanitaTime || formData.resepsiTime}
+                      onChange={(e) => {
+                        handleChange('resepsiWanitaTime', e.target.value);
+                        handleChange('resepsiTime', e.target.value);
+                      }}
                       placeholder="Contoh: 11.00 - 14.00 WIB"
                       className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
                     />
@@ -853,25 +862,105 @@ export function CustomizerModal({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-stone-700 mb-1">
-                      Tempat / Gedung Resepsi
+                      Tempat / Gedung Resepsi Wanita
                     </label>
                     <input
                       type="text"
-                      value={formData.resepsiVenue || formData.venueName}
-                      onChange={(e) => handleChange('resepsiVenue', e.target.value)}
+                      value={formData.resepsiWanitaVenue || formData.resepsiVenue || formData.venueName}
+                      onChange={(e) => {
+                        handleChange('resepsiWanitaVenue', e.target.value);
+                        handleChange('resepsiVenue', e.target.value);
+                      }}
                       placeholder="Contoh: Gedung Serbaguna Melati"
                       className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-stone-700 mb-1">
-                      Alamat Singkat Resepsi
+                      Alamat Singkat Resepsi Wanita
                     </label>
                     <input
                       type="text"
-                      value={formData.resepsiAddress || formData.venueAddress}
-                      onChange={(e) => handleChange('resepsiAddress', e.target.value)}
+                      value={formData.resepsiWanitaAddress || formData.resepsiAddress || formData.venueAddress}
+                      onChange={(e) => {
+                        handleChange('resepsiWanitaAddress', e.target.value);
+                        handleChange('resepsiAddress', e.target.value);
+                      }}
                       placeholder="Contoh: Jl. Melati No. 12, Jakarta"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Resepsi di Mempelai Pria (Ngunduh Mantu) */}
+              <div className="bg-sky-50/50 p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>🎊</span>
+                  <span>Acara 3: Resepsi di Mempelai Pria (Ngunduh Mantu)</span>
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nama Acara 3
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiPriaTitle || 'Resepsi di Mempelai Pria'}
+                      onChange={(e) => handleChange('resepsiPriaTitle', e.target.value)}
+                      placeholder="Contoh: Resepsi di Mempelai Pria"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Hari &amp; Tanggal
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiPriaDate || 'Sabtu, 26 Desember 2026'}
+                      onChange={(e) => handleChange('resepsiPriaDate', e.target.value)}
+                      placeholder="Contoh: Sabtu, 26 Desember 2026"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Waktu Pelaksanaan
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiPriaTime || '10.00 WIB - Selesai'}
+                      onChange={(e) => handleChange('resepsiPriaTime', e.target.value)}
+                      placeholder="Contoh: 10.00 WIB - Selesai"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Tempat / Lokasi Resepsi Pria
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiPriaVenue || 'Kediaman Mempelai Pria'}
+                      onChange={(e) => handleChange('resepsiPriaVenue', e.target.value)}
+                      placeholder="Contoh: Kediaman Mempelai Pria"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Alamat Lengkap Resepsi Pria
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiPriaAddress || 'Jl. Cendrawasih No. 45, Jakarta'}
+                      onChange={(e) => handleChange('resepsiPriaAddress', e.target.value)}
+                      placeholder="Contoh: Jl. Cendrawasih No. 45, Jakarta"
                       className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
                     />
                   </div>
@@ -880,7 +969,7 @@ export function CustomizerModal({
             </div>
           )}
 
-          {/* TAB 3: LOKASI & ALAMAT */}
+          {/* TAB 3: LOKASI & ALAMAT KEDUANYA */}
           {activeTab === 'lokasi' && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -890,7 +979,7 @@ export function CustomizerModal({
                   </label>
                   <input
                     type="text"
-                    value={formData.locationSectionTitle || 'LOKASI ACARA'}
+                    value={formData.locationSectionTitle || 'LOKASI & PETUNJUK ARAH'}
                     onChange={(e) => handleChange('locationSectionTitle', e.target.value)}
                     placeholder="Contoh: LOKASI ACARA"
                     className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
@@ -902,7 +991,7 @@ export function CustomizerModal({
                   </label>
                   <input
                     type="text"
-                    value={formData.locationSectionSubtitle || 'Lokasi acara pernikahan'}
+                    value={formData.locationSectionSubtitle || 'Alamat lokasi acara untuk kedua mempelai'}
                     onChange={(e) => handleChange('locationSectionSubtitle', e.target.value)}
                     placeholder="Contoh: Lokasi acara pernikahan"
                     className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
@@ -910,151 +999,318 @@ export function CustomizerModal({
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Nama Tempat / Gedung Utama
-                </label>
-                <input
-                  type="text"
-                  value={formData.venueName}
-                  onChange={(e) => handleChange('venueName', e.target.value)}
-                  placeholder="Contoh: Gedung Serbaguna Melati"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Alamat Lengkap
-                </label>
-                <textarea
-                  rows={2}
-                  value={formData.venueAddress}
-                  onChange={(e) => handleChange('venueAddress', e.target.value)}
-                  placeholder="Contoh: Jl. Melati No. 12, Jakarta"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Tautan Google Maps
-                </label>
-                <input
-                  type="url"
-                  value={formData.googleMapsUrl}
-                  onChange={(e) => handleChange('googleMapsUrl', e.target.value)}
-                  placeholder="https://maps.google.com/..."
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs font-mono text-stone-900 outline-hidden"
-                />
-                <p className="text-[11px] text-stone-500 mt-1">
-                  Link ini akan terbuka saat tamu menekan tombol navigasi peta.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Teks Tombol Google Maps
-                </label>
-                <input
-                  type="text"
-                  value={formData.googleMapsButtonText || 'Buka Google Maps'}
-                  onChange={(e) => handleChange('googleMapsButtonText', e.target.value)}
-                  placeholder="Contoh: Buka Google Maps"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: DIALOG KOMIK */}
-          {activeTab === 'komik' && (
-            <div className="space-y-3">
-              <p className="text-xs text-stone-600 mb-2">
-                Sesuaikan percakapan 4 panel komik di sampul depan (Foto 1):
-              </p>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Panel 1 (Andi bertanya tanggal):
-                </label>
-                <input
-                  type="text"
-                  value={formData.comicDialogues.panel1}
-                  onChange={(e) => handleComicChange('panel1', e.target.value)}
-                  placeholder="Eh, kamu tanggal 20 kosong nggak?"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Panel 2 (Sinta penasaran):
-                </label>
-                <input
-                  type="text"
-                  value={formData.comicDialogues.panel2}
-                  onChange={(e) => handleComicChange('panel2', e.target.value)}
-                  placeholder="Kosong sih. Kenapa?"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Panel 3 (Andi misterius):
-                </label>
-                <input
-                  type="text"
-                  value={formData.comicDialogues.panel3}
-                  onChange={(e) => handleComicChange('panel3', e.target.value)}
-                  placeholder="Ada acara penting."
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Panel 4 (Punchline / Pengumuman):
-                </label>
-                <input
-                  type="text"
-                  value={formData.comicDialogues.panel4}
-                  onChange={(e) => handleComicChange('panel4', e.target.value)}
-                  placeholder="Nikahan gue."
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
-                />
-              </div>
-
-              {/* Opsi Tampilan Bar Browser */}
-              <div className="pt-3.5 mt-3.5 border-t border-stone-300 bg-stone-50 p-3 rounded-xl">
-                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+              {/* Lokasi Mempelai Wanita */}
+              <div className="bg-rose-50/50 p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>👰</span>
+                  <span>Lokasi Pihak Wanita</span>
+                </span>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Nama Tempat / Gedung
+                  </label>
                   <input
-                    type="checkbox"
-                    checked={formData.showBrowserMockup !== false}
-                    onChange={(e) => handleChange('showBrowserMockup', e.target.checked)}
-                    className="w-4 h-4 mt-0.5 rounded-sm border-stone-400 text-stone-900 focus:ring-0 cursor-pointer"
+                    type="text"
+                    value={formData.venueWanitaName || formData.venueName}
+                    onChange={(e) => {
+                      handleChange('venueWanitaName', e.target.value);
+                      handleChange('venueName', e.target.value);
+                    }}
+                    placeholder="Contoh: Gedung Serbaguna Melati"
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
                   />
-                  <div>
-                    <span className="font-bold text-xs text-stone-900">
-                      Tampilkan Bingkai Bar Browser Hitam di Sampul (<code className="text-[11px] font-mono">undanganku.com/...</code>)
-                    </span>
-                    <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed">
-                      💡 <em>Ingin tampilan bersih tanpa bar browser?</em> Cukup hilangkan tanda centang ini, maka kartu sampul komik akan tampil bersih dan elegan dengan sudut membulat.
-                    </p>
-                  </div>
-                </label>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Alamat Lengkap
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.venueWanitaAddress || formData.venueAddress}
+                    onChange={(e) => {
+                      handleChange('venueWanitaAddress', e.target.value);
+                      handleChange('venueAddress', e.target.value);
+                    }}
+                    placeholder="Contoh: Jl. Melati No. 12, Jakarta"
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Tautan Google Maps Wanita
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.mapsWanitaUrl || formData.googleMapsUrl}
+                    onChange={(e) => {
+                      handleChange('mapsWanitaUrl', e.target.value);
+                      handleChange('googleMapsUrl', e.target.value);
+                    }}
+                    placeholder="https://maps.google.com/..."
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-900 outline-hidden"
+                  />
+                </div>
+              </div>
+
+              {/* Lokasi Mempelai Pria */}
+              <div className="bg-sky-50/50 p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>🤵</span>
+                  <span>Lokasi Pihak Pria</span>
+                </span>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Nama Tempat / Kediaman
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.venuePriaName || 'Kediaman Mempelai Pria'}
+                    onChange={(e) => handleChange('venuePriaName', e.target.value)}
+                    placeholder="Contoh: Kediaman Mempelai Pria"
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Alamat Lengkap
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.venuePriaAddress || 'Jl. Cendrawasih No. 45, Jakarta Timur'}
+                    onChange={(e) => handleChange('venuePriaAddress', e.target.value)}
+                    placeholder="Contoh: Jl. Cendrawasih No. 45, Jakarta Timur"
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Tautan Google Maps Pria
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.mapsPriaUrl || 'https://maps.google.com/?q=Jakarta'}
+                    onChange={(e) => handleChange('mapsPriaUrl', e.target.value)}
+                    placeholder="https://maps.google.com/..."
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-900 outline-hidden"
+                  />
+                </div>
               </div>
             </div>
           )}
 
-          {/* TAB 5: KUTIPAN & CERITA */}
+          {/* TAB 4: DIALOG & BAHAN KOMIK COVER */}
+          {activeTab === 'komik' && (
+            <div className="space-y-4">
+              <div className="bg-amber-50/70 border border-amber-300 rounded-xl p-3 text-xs text-amber-900">
+                🎨 <strong>Kustomisasi 4 Panel Komik Sampul:</strong> Anda dapat mengganti gambar ilustrasi dengan bahan Anda sendiri (link URL gambar/foto), mengubah teks dialog, dan mengatur letak balon kata (kiri atas, kanan atas, dsb). Kosongkan URL gambar jika ingin menggunakan doodle animasi bawaan.
+              </div>
+
+              {/* 4 Panels Customizer */}
+              {[
+                {
+                  id: 1,
+                  imgKey: 'panel1Image' as const,
+                  textKey: 'panel1Text' as const,
+                  posKey: 'panel1BubblePos' as const,
+                  dialogueKey: 'panel1' as const,
+                  label: 'Panel 1 (Andi bertanya)',
+                  defaultText: 'Eh, kamu tanggal 20 kosong nggak?',
+                },
+                {
+                  id: 2,
+                  imgKey: 'panel2Image' as const,
+                  textKey: 'panel2Text' as const,
+                  posKey: 'panel2BubblePos' as const,
+                  dialogueKey: 'panel2' as const,
+                  label: 'Panel 2 (Sinta penasaran)',
+                  defaultText: 'Kosong sih. Kenapa?',
+                },
+                {
+                  id: 3,
+                  imgKey: 'panel3Image' as const,
+                  textKey: 'panel3Text' as const,
+                  posKey: 'panel3BubblePos' as const,
+                  dialogueKey: 'panel3' as const,
+                  label: 'Panel 3 (Andi misterius)',
+                  defaultText: 'Ada acara penting.',
+                },
+                {
+                  id: 4,
+                  imgKey: 'panel4Image' as const,
+                  textKey: 'panel4Text' as const,
+                  posKey: 'panel4BubblePos' as const,
+                  dialogueKey: 'panel4' as const,
+                  label: 'Panel 4 (Punchline / Pengumuman)',
+                  defaultText: 'Nikahan gue.',
+                },
+              ].map((panel) => (
+                <div
+                  key={panel.id}
+                  className="bg-white border-2 border-stone-800 rounded-xl p-3.5 shadow-[2px_3px_0px_#231f1d] space-y-2.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-full bg-amber-300 border border-stone-800 flex items-center justify-center text-[11px] font-bold">
+                        {panel.id}
+                      </span>
+                      <span>{panel.label}</span>
+                    </span>
+                    {formData[panel.imgKey] && (
+                      <button
+                        type="button"
+                        onClick={() => handleChange(panel.imgKey, '')}
+                        className="text-[11px] text-rose-600 hover:text-rose-800 font-bold cursor-pointer"
+                      >
+                        Pakai Doodle Bawaan
+                      </button>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-stone-700 mb-0.5">
+                      URL Bahan Gambar Sendiri (Opsional):
+                    </label>
+                    <input
+                      type="url"
+                      value={formData[panel.imgKey] || ''}
+                      onChange={(e) => handleChange(panel.imgKey, e.target.value)}
+                      placeholder="https://... (isi untuk menggunakan gambar sendiri)"
+                      className="w-full bg-[#fdfbf7] border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1 text-xs font-mono text-stone-900 outline-hidden"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div className="sm:col-span-2">
+                      <label className="block text-[11px] font-bold text-stone-700 mb-0.5">
+                        Teks Balon Kata:
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          formData[panel.textKey] ??
+                          (formData.comicDialogues ? formData.comicDialogues[panel.dialogueKey] : panel.defaultText)
+                        }
+                        onChange={(e) => {
+                          handleChange(panel.textKey, e.target.value);
+                          handleComicChange(panel.dialogueKey, e.target.value);
+                        }}
+                        placeholder={panel.defaultText}
+                        className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1 text-xs text-stone-900 outline-hidden font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-stone-700 mb-0.5">
+                        Letak Balon Kata:
+                      </label>
+                      <select
+                        value={formData[panel.posKey] || (panel.id % 2 === 1 ? 'top-right' : 'top-left')}
+                        onChange={(e) => handleChange(panel.posKey, e.target.value as any)}
+                        className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2 py-1 text-xs text-stone-900 outline-hidden font-bold cursor-pointer"
+                      >
+                        <option value="top-left">Kiri Atas</option>
+                        <option value="top-right">Kanan Atas</option>
+                        <option value="bottom-left">Kiri Bawah</option>
+                        <option value="bottom-right">Kanan Bawah</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* TAB 5: BAB 1 (SALAM), BAB 2 (AYAT AL-QURAN) & BAB 4 (CERITA) */}
           {activeTab === 'cerita' && (
             <div className="space-y-4">
+              {/* BAB 1: UCAPAN SALAM */}
+              <div className="bg-sky-50/50 p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>🕊️</span>
+                  <span>Bab 1: Ucapan Salam &amp; Pembuka</span>
+                </span>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Salam Pembuka
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.greetingSalam || "Assalamu'alaikum Warahmatullahi Wabarakatuh"}
+                    onChange={(e) => handleChange('greetingSalam', e.target.value)}
+                    placeholder="Assalamu'alaikum Warahmatullahi Wabarakatuh"
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Kalimat Pengantar Pembuka
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={
+                      formData.greetingOpening ||
+                      "Dengan memohon rahmat dan ridho Allah Subhanahu Wa Ta'ala, kami bermaksud menyelenggarakan syukuran pernikahan putra-putri kami tercinta:"
+                    }
+                    onChange={(e) => handleChange('greetingOpening', e.target.value)}
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+              </div>
+
+              {/* BAB 2: AYAT AL-QUR'AN */}
+              <div className="bg-amber-50/50 p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>📜</span>
+                  <span>Bab 2: Ayat-Ayat Al-Qur'an</span>
+                </span>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Teks Arab Ayat Al-Qur'an
+                  </label>
+                  <textarea
+                    rows={3}
+                    dir="rtl"
+                    value={
+                      formData.quranArabic ||
+                      'وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً ۚ إِنَّ فِي ذَٰلِكَ لَآيَاتٍ لِّقَوْمٍ يَتَفَكَّرُونَ'
+                    }
+                    onChange={(e) => handleChange('quranArabic', e.target.value)}
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-sm font-serif text-stone-900 outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Terjemahan / Arti Ayat
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.quoteText}
+                    onChange={(e) => handleChange('quoteText', e.target.value)}
+                    placeholder="Teks terjemahan ayat..."
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Sumber Surah &amp; Ayat
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.quoteSource || 'QS. Ar-Rum : 21'}
+                    onChange={(e) => handleChange('quoteSource', e.target.value)}
+                    placeholder="Contoh: QS. Ar-Rum : 21"
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+              </div>
+
+              {/* BAB 4: KISAH KAMI (OUR STORY) */}
               <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
                 <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
                   <span>📖</span>
-                  <span>Judul &amp; Subtitle Bagian Kisah Kami</span>
+                  <span>Bab 4: Kisah Perjalanan Cinta (Our Story)</span>
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
@@ -1082,50 +1338,17 @@ export function CustomizerModal({
                     />
                   </div>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Kisah Pertemuan / Perjalanan Cinta (Our Story)
-                </label>
-                <textarea
-                  rows={4}
-                  value={formData.ourStory}
-                  onChange={(e) => handleChange('ourStory', e.target.value)}
-                  placeholder="Ceritakan kisah cinta atau pertemuan Anda berdua..."
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm text-stone-900 outline-hidden"
-                />
-              </div>
-
-              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
-                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
-                  <span>📜</span>
-                  <span>Kutipan Ayat Suci / Mutiara Kata</span>
-                </span>
 
                 <div>
                   <label className="block text-xs font-bold text-stone-700 mb-1">
-                    Teks Kutipan / Ayat
+                    Isi Cerita Pertemuan / Kisah Cinta
                   </label>
                   <textarea
-                    rows={3}
-                    value={formData.quoteText}
-                    onChange={(e) => handleChange('quoteText', e.target.value)}
-                    placeholder="Teks ayat atau mutiara kata..."
-                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs text-stone-900 outline-hidden"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 mb-1">
-                    Sumber Kutipan
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.quoteSource}
-                    onChange={(e) => handleChange('quoteSource', e.target.value)}
-                    placeholder="Contoh: QS. Ar-Rum : 21"
-                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                    rows={4}
+                    value={formData.ourStory}
+                    onChange={(e) => handleChange('ourStory', e.target.value)}
+                    placeholder="Ceritakan kisah cinta atau pertemuan Anda berdua..."
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm text-stone-900 outline-hidden"
                   />
                 </div>
               </div>
@@ -1544,13 +1767,29 @@ export function CustomizerModal({
                     Kalimat Penutup
                   </label>
                   <textarea
-                    rows={3}
+                    rows={2}
                     value={
                       formData.closingText ||
                       'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu kepada kedua mempelai.'
                     }
                     onChange={(e) => handleChange('closingText', e.target.value)}
                     placeholder="Kalimat penutup..."
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Doa Tulus dari Kedua Mempelai (Bab 10)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={
+                      formData.closingPrayer ||
+                      "Semoga Allah Subhanahu Wa Ta'ala membalas segala kebaikan serta keikhlasan doa restu yang telah diberikan, dan melimpahkan keberkahan bagi kita semua. Aamiin ya Rabbal 'Alamin."
+                    }
+                    onChange={(e) => handleChange('closingPrayer', e.target.value)}
+                    placeholder="Doa tulus kedua mempelai..."
                     className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
                   />
                 </div>

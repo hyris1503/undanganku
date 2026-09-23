@@ -9,39 +9,10 @@ interface ComicCoverProps {
 }
 
 export function ComicCover({ onOpenInvitation, data, guestName }: ComicCoverProps) {
-  const showMockup = data.showBrowserMockup !== false;
-
   return (
     <section id="comic-cover-section" className="max-w-2xl mx-auto w-full px-3 py-4 md:py-8">
-      {/* Optional Browser Mockup Window as in Photo 1 */}
-      {showMockup && (
-        <div className="bg-[#24292e] rounded-t-xl px-4 py-2.5 flex items-center justify-between shadow-md border-2 border-b-0 border-stone-800">
-          {/* Window Traffic Lights */}
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#ff5f56] inline-block border border-[#e0443e]"></span>
-            <span className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block border border-[#dea123]"></span>
-            <span className="w-3 h-3 rounded-full bg-[#27c93f] inline-block border border-[#1aab29]"></span>
-          </div>
-
-          {/* Address Bar */}
-          <div className="flex items-center gap-1.5 bg-[#171b1d] text-stone-300 px-3 py-1 rounded-md text-xs font-mono max-w-xs w-full mx-2 border border-stone-700/60 justify-center">
-            <Lock className="w-3 h-3 text-stone-400 shrink-0" />
-            <span className="truncate">undanganku.com/{data.groomName.toLowerCase()}-{data.brideName.toLowerCase()}</span>
-          </div>
-
-          {/* Share Icon */}
-          <div className="text-stone-400">
-            <ExternalLink className="w-3.5 h-3.5" />
-          </div>
-        </div>
-      )}
-
       {/* Comic Content Canvas */}
-      <div
-        className={`relative bg-[#f7f3ec] border-2 border-stone-800 p-4 sm:p-6 shadow-[5px_6px_0px_#231f1d] ${
-          showMockup ? 'rounded-b-xl' : 'rounded-2xl'
-        }`}
-      >
+      <div className="relative bg-[#f7f3ec] border-2 border-stone-800 p-4 sm:p-6 shadow-[5px_6px_0px_#231f1d] rounded-2xl">
         {/* Washi tape accent on top */}
         <div className="washi-tape-strip" />
 
@@ -55,8 +26,31 @@ export function ComicCover({ onOpenInvitation, data, guestName }: ComicCoverProp
             />
           </div>
         ) : (
-          /* 4-Panel Comic Strip Default */
-          <ComicStrip dialogues={data.comicDialogues} />
+          /* 4-Panel Comic Strip with customizable materials and placements */
+          <ComicStrip
+            dialogues={data.comicDialogues}
+            panel1={{
+              imageUrl: data.panel1Image,
+              text: data.panel1Text,
+              bubblePos: data.panel1BubblePos,
+            }}
+            panel2={{
+              imageUrl: data.panel2Image,
+              text: data.panel2Text,
+              bubblePos: data.panel2BubblePos,
+            }}
+            panel3={{
+              imageUrl: data.panel3Image,
+              text: data.panel3Text,
+              bubblePos: data.panel3BubblePos,
+            }}
+            panel4={{
+              imageUrl: data.panel4Image,
+              text: data.panel4Text,
+              bubblePos: data.panel4BubblePos,
+            }}
+            extraPanels={data.coverPanels && data.coverPanels.length > 4 ? data.coverPanels.slice(4) : []}
+          />
         )}
 
         {/* Invitation Headline Area */}

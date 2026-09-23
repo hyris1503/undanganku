@@ -19,7 +19,7 @@ export function GlobalAmbientOverlay({ type = 'none', customUrl }: GlobalAmbient
     return (
       <div
         aria-hidden="true"
-        className="fixed inset-0 pointer-events-none z-30 overflow-hidden select-none opacity-75 mix-blend-multiply"
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none opacity-60 mix-blend-multiply"
       >
         {isVideo ? (
           <video
@@ -56,7 +56,7 @@ export function GlobalAmbientOverlay({ type = 'none', customUrl }: GlobalAmbient
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 pointer-events-none z-30 overflow-hidden select-none"
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
     >
       <style>{`
         @keyframes ambientFall {

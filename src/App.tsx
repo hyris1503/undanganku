@@ -406,25 +406,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Floating Mode Switcher Button in Guest Mode so host can seamlessly return to Edit Mode anytime */}
-      {isGuestMode && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-[#2d3136]/90 hover:bg-stone-900 text-white px-3.5 py-2 rounded-full border border-stone-700 shadow-xl backdrop-blur-xs transition-all">
-          <span className="text-[11px] font-hand text-stone-300 flex items-center gap-1">
-            <Eye className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden sm:inline">Mode Tamu Aktif</span>
-          </span>
-          <span className="text-stone-500">|</span>
-          <button
-            onClick={handleExitGuestMode}
-            className="text-xs font-hand font-bold text-amber-300 hover:text-amber-200 flex items-center gap-1 cursor-pointer transition-colors"
-            title="Kembali ke Mode Edit untuk mengubah isi undangan"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            <span>Mode Edit</span>
-          </button>
-        </div>
-      )}
-
       {/* Interactive Customization Modal */}
       <CustomizerModal
         isOpen={showCustomizerModal}
