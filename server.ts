@@ -14,6 +14,9 @@ async function startServer() {
   // API Route to fetch persistent invitation data
   app.get("/api/invitation-data", (req, res) => {
     try {
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
       if (fs.existsSync(DATA_FILE)) {
         const content = fs.readFileSync(DATA_FILE, "utf-8");
         return res.json(JSON.parse(content));

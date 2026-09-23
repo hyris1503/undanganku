@@ -26,6 +26,7 @@ import { weddingAudio } from './utils/audio';
 export default function App() {
   // BY DEFAULT: 100% Clean Guest Mode!
   // Toolbar is completely hidden unless URL has ?edit=true or ?admin=true
+  // Guest name extracted from URL query parameters
   const [guestName, setGuestName] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -41,33 +42,32 @@ export default function App() {
     return 'Tamu Undangan';
   });
 
-  // Track if current session is authenticated as admin/host
-  const [isAdminSession, setIsAdminSession] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('edit') === 'true' || params.get('admin') === 'true') {
-        try {
-          sessionStorage.setItem('wedding_is_admin', 'true');
-        } catch {}
-        return true;
-      }
-      try {
-        return sessionStorage.getItem('wedding_is_admin') === 'true';
-      } catch {}
-    }
-    return false;
-  });
+  // Check if link was explicitly sent to a guest (has ?to=, ?tamu=, etc.)
+  const hasGuestQueryParam = typeof window !== 'undefined' && Boolean(
+    new URLSearchParams(window.location.search).get('to') ||
+    new URLSearchParams(window.location.search).get('u') ||
+    new URLSearchParams(window.location.search).get('tamu') ||
+    new URLSearchParams(window.location.search).get('nama')
+  );
 
-  // BY DEFAULT: 100% Clean Guest Mode!
-  // Toolbar is completely hidden unless URL has ?edit=true or ?admin=true
+  // Guest mode toggle state:
+  // If ?edit=true or ?admin=true is present -> Host Edit Mode
+  // If ?to= or ?tamu= is present without ?edit -> Guest Mode
+  // Otherwise (e.g. initial development / AI Studio preview) -> Host Edit Mode so user can easily customize
   const [isGuestMode, setIsGuestMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('edit') === 'true' || params.get('admin') === 'true') {
         return false;
       }
+      if (hasGuestQueryParam) {
+        return true;
+      }
+      const savedMode = localStorage.getItem('wedding_view_mode');
+      if (savedMode === 'guest') return true;
+      if (savedMode === 'edit') return false;
     }
-    return true; // Default: 100% Clean guest view for all recipients
+    return false; // Default to Host Edit Mode in AI Studio preview
   });
 
   // By default, only show the Cover (Foto 1) so guest has a true invitation opening experience
@@ -92,30 +92,50 @@ export default function App() {
   });
 
   // Fetch latest data from server so ANY device/guest/browser gets updated data
-  useEffect(() => {
-    const fetchServerData = async () => {
-      try {
-        const res = await fetch('/api/invitation-data');
-        if (res.ok) {
-          const serverData = await res.json();
-          if (serverData && typeof serverData === 'object') {
-            setInvitationData((prev) => {
-              const merged = { ...defaultInvitationData, ...prev, ...serverData };
-              try {
-                localStorage.setItem('wedding_invitation_data', JSON.stringify(merged));
-              } catch {}
-              return merged;
-            });
-          }
+  const syncFromServer = async () => {
+    try {
+      const res = await fetch(`/api/invitation-data?t=${Date.now()}`);
+      if (res.ok) {
+        const serverData = await res.json();
+        if (serverData && typeof serverData === 'object' && Object.keys(serverData).length > 0) {
+          setInvitationData((prev) => {
+            const merged = { ...defaultInvitationData, ...prev, ...serverData };
+            try {
+              localStorage.setItem('wedding_invitation_data', JSON.stringify(merged));
+            } catch {}
+            return merged;
+          });
         }
-      } catch (err) {
-        console.error('Failed to fetch server invitation data:', err);
+      }
+    } catch (err) {
+      console.error('Failed to fetch server invitation data:', err);
+    }
+  };
+
+  useEffect(() => {
+    syncFromServer();
+
+    // Re-fetch whenever tab gains focus or visibility changes (e.g. user modified in another tab)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        syncFromServer();
       }
     };
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', syncFromServer);
 
-    fetchServerData();
+    // Cross-tab broadcast channel sync
+    let broadcastChannel: BroadcastChannel | null = null;
+    try {
+      broadcastChannel = new BroadcastChannel('wedding_invitation_sync');
+      broadcastChannel.onmessage = (event) => {
+        if (event.data && typeof event.data === 'object') {
+          setInvitationData((prev) => ({ ...prev, ...event.data }));
+        }
+      };
+    } catch {}
 
-    // Listen for storage events across tabs (e.g. admin tab <-> guest tab)
+    // Storage event sync
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'wedding_invitation_data' && e.newValue) {
         try {
@@ -124,9 +144,16 @@ export default function App() {
         } catch {}
       }
     };
-
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', syncFromServer);
+      window.removeEventListener('storage', handleStorageChange);
+      if (broadcastChannel) {
+        broadcastChannel.close();
+      }
+    };
   }, []);
 
   // Synchronize audio URL with audio controller
@@ -141,6 +168,13 @@ export default function App() {
     } catch {
       // Ignore storage errors
     }
+
+    // Broadcast immediately across open tabs
+    try {
+      const channel = new BroadcastChannel('wedding_invitation_sync');
+      channel.postMessage(newData);
+      channel.close();
+    } catch {}
 
     // Persist to server so any guest on any device/phone gets this update
     fetch('/api/invitation-data', {
@@ -372,16 +406,21 @@ export default function App() {
         )}
       </main>
 
-      {/* Discreet Floating Button ONLY visible if you entered via ?admin=true / ?edit=true */}
-      {isGuestMode && isAdminSession && (
-        <div className="fixed bottom-20 right-3 z-50">
+      {/* Floating Mode Switcher Button in Guest Mode so host can seamlessly return to Edit Mode anytime */}
+      {isGuestMode && (
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-[#2d3136]/90 hover:bg-stone-900 text-white px-3.5 py-2 rounded-full border border-stone-700 shadow-xl backdrop-blur-xs transition-all">
+          <span className="text-[11px] font-hand text-stone-300 flex items-center gap-1">
+            <Eye className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">Mode Tamu Aktif</span>
+          </span>
+          <span className="text-stone-500">|</span>
           <button
             onClick={handleExitGuestMode}
-            className="bg-stone-800/80 hover:bg-stone-900 text-stone-300 hover:text-white px-3 py-1.5 rounded-full text-xs font-hand font-bold shadow-lg border border-stone-600/70 backdrop-blur-xs flex items-center gap-1.5 transition-all opacity-70 hover:opacity-100 cursor-pointer"
-            title="Kembali ke Mode Edit (Toolbar Pengaturan Mempelai)"
+            className="text-xs font-hand font-bold text-amber-300 hover:text-amber-200 flex items-center gap-1 cursor-pointer transition-colors"
+            title="Kembali ke Mode Edit untuk mengubah isi undangan"
           >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-amber-300" />
-            <span>Mode Edit (Admin)</span>
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span>Mode Edit</span>
           </button>
         </div>
       )}

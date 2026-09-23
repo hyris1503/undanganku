@@ -11,6 +11,9 @@ import {
   VolumeX,
   Instagram,
   Heart,
+  ExternalLink,
+  MessageCircle,
+  Package,
 } from 'lucide-react';
 import {
   FloralSprig,
@@ -22,6 +25,7 @@ import {
   MapIllustration,
   PolaroidGallery,
 } from './ComicDoodles';
+import { ScrollReveal } from './ScrollReveal';
 import { InvitationData } from '../types/invitation';
 import { weddingAudio } from '../utils/audio';
 
@@ -48,26 +52,28 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
   const [wishes, setWishes] = useState<Wish[]>([
     {
       id: '1',
-      name: 'Rima',
-      message: 'Selamat yaa Andi & Sinta! Semoga selalu bahagia bersama ❤️',
+      name: 'Rima & Keluarga',
+      message: 'Selamat yaa Haris & Febri! Semoga selalu sakinah, mawaddah, warahmah ❤️',
       date: '2 jam yang lalu',
     },
     {
       id: '2',
-      name: 'Dika',
-      message: 'Barakallah, semoga menjadi keluarga sakinah, mawaddah, warahmah. ❤️',
+      name: 'Dika Pratama',
+      message: 'Barakallah, lancar sampai hari H bro! Bahagia selamanya.',
       date: '4 jam yang lalu',
     },
     {
       id: '3',
-      name: 'Sarah',
-      message: 'Happy wedding! Semoga lancar sampai hari H. ❤️',
+      name: 'Sarah N.',
+      message: 'Happy wedding! Semoga menjadi keluarga yang penuh berkah dan cinta. ❤️',
       date: 'Kemarin',
     },
   ]);
   const [newWishName, setNewWishName] = useState('');
   const [newWishMessage, setNewWishMessage] = useState('');
   const [copiedBank, setCopiedBank] = useState(false);
+  const [copiedBank2, setCopiedBank2] = useState(false);
+  const [copiedAddress, setCopiedAddress] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
   const [isPlayingMusic, setIsPlayingMusic] = useState(() => weddingAudio.getStatus());
 
@@ -83,6 +89,18 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
   const handleRsvpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!rsvpName.trim()) return;
+
+    // Optional WhatsApp forward
+    if (data.rsvpWhatsappNumber) {
+      const cleanWa = data.rsvpWhatsappNumber.replace(/[^0-9]/g, '');
+      if (cleanWa) {
+        const text = `Halo, saya *${rsvpName}* mengonfirmasi bahwa saya *${
+          attendance === 'hadir' ? `akan HADIR (${guestCount} orang)` : 'TIDAK DAPAT HADIR'
+        }* pada pernikahan ${data.groomName} & ${data.brideName}. Terima kasih!`;
+        window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(text)}`, '_blank');
+      }
+    }
+
     setRsvpSubmitted(true);
     setTimeout(() => {
       setRsvpSubmitted(false);
@@ -105,10 +123,22 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
     setNewWishName('');
   };
 
-  const copyAccountNumber = () => {
-    navigator.clipboard.writeText(data.bankAccountNumber.replace(/\s+/g, ''));
-    setCopiedBank(true);
-    setTimeout(() => setCopiedBank(false), 3000);
+  const copyAccountNumber = (accNumber: string, isSecond = false) => {
+    navigator.clipboard.writeText(accNumber.replace(/\s+/g, ''));
+    if (isSecond) {
+      setCopiedBank2(true);
+      setTimeout(() => setCopiedBank2(false), 3000);
+    } else {
+      setCopiedBank(true);
+      setTimeout(() => setCopiedBank(false), 3000);
+    }
+  };
+
+  const copyAddress = () => {
+    if (!data.giftAddress) return;
+    navigator.clipboard.writeText(data.giftAddress);
+    setCopiedAddress(true);
+    setTimeout(() => setCopiedAddress(false), 3000);
   };
 
   const scrollToSection = (id: string) => {
@@ -118,38 +148,51 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
     }
   };
 
+  // Custom photos array for PolaroidGallery
+  const customGalleryList = [
+    { imageUrl: data.galleryPhoto1, caption: data.galleryCaption1 },
+    { imageUrl: data.galleryPhoto2, caption: data.galleryCaption2 },
+    { imageUrl: data.galleryPhoto3, caption: data.galleryCaption3 },
+    { imageUrl: data.galleryPhoto4, caption: data.galleryCaption4 },
+    { imageUrl: data.galleryPhoto5, caption: data.galleryCaption5 },
+    { imageUrl: data.galleryPhoto6, caption: data.galleryCaption6 },
+  ];
+
   return (
-    <article id="invitation-article" className="relative max-w-xl mx-auto w-full bg-[#f8f5ee] border-x-2 border-stone-800 shadow-xl overflow-hidden min-h-screen pb-28">
-      {/* Decorative Botanical Borders on Left and Right (matching Photo 2) */}
-      <div className="absolute left-1 top-24 pointer-events-none hidden sm:block opacity-85 z-0">
+    <article
+      id="invitation-article"
+      className="relative max-w-xl mx-auto w-full bg-[#f7f2ea] border-x-2 border-stone-800 shadow-2xl overflow-hidden min-h-screen pb-28"
+    >
+      {/* Decorative Botanical Borders on Left and Right */}
+      <div className="absolute left-1 top-24 pointer-events-none hidden sm:block opacity-75 z-0">
         <FloralSprig className="w-8 h-32" />
       </div>
-      <div className="absolute right-1 top-24 pointer-events-none hidden sm:block opacity-85 z-0">
+      <div className="absolute right-1 top-24 pointer-events-none hidden sm:block opacity-75 z-0">
         <FloralSprig className="w-8 h-32" flipped />
       </div>
-      <div className="absolute left-1 top-[420px] pointer-events-none hidden sm:block opacity-85 z-0">
+      <div className="absolute left-1 top-[460px] pointer-events-none hidden sm:block opacity-75 z-0">
         <FloralSprig className="w-8 h-32" />
       </div>
-      <div className="absolute right-1 top-[420px] pointer-events-none hidden sm:block opacity-85 z-0">
+      <div className="absolute right-1 top-[460px] pointer-events-none hidden sm:block opacity-75 z-0">
         <FloralSprig className="w-8 h-32" flipped />
       </div>
-      <div className="absolute left-1 top-[950px] pointer-events-none hidden sm:block opacity-85 z-0">
+      <div className="absolute left-1 top-[1020px] pointer-events-none hidden sm:block opacity-75 z-0">
         <FloralSprig className="w-8 h-32" />
       </div>
-      <div className="absolute right-1 top-[950px] pointer-events-none hidden sm:block opacity-85 z-0">
+      <div className="absolute right-1 top-[1020px] pointer-events-none hidden sm:block opacity-75 z-0">
         <FloralSprig className="w-8 h-32" flipped />
       </div>
-      <div className="absolute left-1 top-[1500px] pointer-events-none hidden sm:block opacity-85 z-0">
+      <div className="absolute left-1 top-[1620px] pointer-events-none hidden sm:block opacity-75 z-0">
         <FloralSprig className="w-8 h-32" />
       </div>
-      <div className="absolute right-1 top-[1500px] pointer-events-none hidden sm:block opacity-85 z-0">
+      <div className="absolute right-1 top-[1620px] pointer-events-none hidden sm:block opacity-75 z-0">
         <FloralSprig className="w-8 h-32" flipped />
       </div>
 
       {/* Floating Audio / Ambient Music Button */}
       <div className="fixed top-4 right-4 z-40 flex items-center gap-2">
         {data.musicTitle && isPlayingMusic && (
-          <div className="hidden sm:flex items-center gap-1.5 bg-stone-900/85 text-amber-200 text-[11px] font-hand font-bold px-3 py-1 rounded-full border border-stone-700 shadow-sm backdrop-blur-xs animate-in fade-in">
+          <div className="hidden sm:flex items-center gap-1.5 bg-stone-900/90 text-amber-200 text-[11px] font-hand font-bold px-3 py-1 rounded-full border border-stone-700 shadow-md backdrop-blur-xs animate-in fade-in">
             <span className="text-xs">🎵</span>
             <span className="max-w-[150px] truncate">{data.musicTitle}</span>
           </div>
@@ -158,7 +201,7 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
           onClick={handleToggleMusic}
           aria-label="Putar Musik"
           title={isPlayingMusic ? `Matikan Musik (${data.musicTitle || 'Musik'})` : 'Nyalakan Musik'}
-          className="w-10 h-10 rounded-full bg-white/90 border-2 border-stone-800 shadow-md flex items-center justify-center text-stone-800 hover:bg-stone-100 transition-transform active:scale-95 cursor-pointer backdrop-blur-xs"
+          className="w-11 h-11 rounded-full bg-white/95 border-2 border-stone-800 shadow-[3px_4px_0px_#231f1d] flex items-center justify-center text-stone-800 hover:bg-amber-50 transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer backdrop-blur-xs"
         >
           {isPlayingMusic ? (
             <Volume2 className="w-5 h-5 text-emerald-700 animate-pulse" />
@@ -170,567 +213,814 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
 
       {/* Main Content Flow */}
       <div className="relative z-10 px-4 sm:px-8 py-8 md:py-12">
-        {/* Header Element (Photo 2 Top) */}
+        {/* HEADER SECTION (Photo 2 Top) */}
         <header id="wedding-header" className="text-center pt-2 pb-6">
-          <p className="font-hand tracking-widest text-xs sm:text-sm text-stone-700 font-bold uppercase">
-            THE WEDDING OF
-          </p>
-
-          <div className="relative inline-block my-2">
-            <span className="text-stone-600 font-mono text-xl font-bold select-none mr-2">
-              `\ -
-            </span>
-            <h1 className="inline text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-wide font-hand text-stone-900 uppercase">
-              {data.groomName} &amp; {data.brideName}
-            </h1>
-            <span className="text-stone-600 font-mono text-xl font-bold select-none ml-2">
-              - /`
-            </span>
-          </div>
-
-          <HeartFlourish />
-
-          <p className="font-hand font-bold text-lg text-stone-800 tracking-widest mt-1">
-            {data.weddingDate}
-          </p>
-
-          {/* Ayat / Quote Box (as shown in Photo 2) */}
-          <div className="mt-6 bg-[#f4ece1] rounded-2xl p-4 sm:p-5 border-2 border-stone-800/80 shadow-xs max-w-md mx-auto text-center">
-            <p className="font-hand text-sm sm:text-base text-stone-800 italic leading-relaxed">
-              &ldquo;{data.quoteText}&rdquo;
+          <ScrollReveal delay={0}>
+            <p className="font-hand tracking-widest text-xs sm:text-sm text-stone-700 font-bold uppercase">
+              {data.coverTitle || 'THE WEDDING OF'}
             </p>
-            <p className="font-hand text-xs sm:text-sm font-bold text-stone-700 mt-2">
-              ({data.quoteSource})
-            </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="mt-3">
+          <ScrollReveal delay={120}>
+            <div className="relative inline-block my-2">
+              <span className="text-stone-600 font-mono text-xl font-bold select-none mr-2">
+                `\ -
+              </span>
+              <h1 className="inline text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-wide font-hand text-stone-900 uppercase">
+                {data.groomName} &amp; {data.brideName}
+              </h1>
+              <span className="text-stone-600 font-mono text-xl font-bold select-none ml-2">
+                - /`
+              </span>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={220}>
+            <HeartFlourish />
+            <p className="font-hand font-bold text-lg text-stone-800 tracking-widest mt-1">
+              {data.weddingDate}
+            </p>
+          </ScrollReveal>
+
+          {/* Ayat / Quote Box with 3D Depth & Washi Tape */}
+          {data.quoteText && (
+            <ScrollReveal delay={340}>
+              <div className="mt-6 relative bg-gradient-to-b from-[#fbf5eb] to-[#f4ebe0] rounded-2xl p-4 sm:p-6 border-2 border-stone-800 shadow-[4px_5px_0px_#231f1d] max-w-md mx-auto text-center">
+                {/* Cute washi tape accent */}
+                <div className="washi-tape-strip" />
+                <p className="font-hand text-sm sm:text-base text-stone-800 italic leading-relaxed">
+                  &ldquo;{data.quoteText}&rdquo;
+                </p>
+                {data.quoteSource && (
+                  <p className="font-hand text-xs sm:text-sm font-bold text-stone-700 mt-2.5">
+                    ({data.quoteSource})
+                  </p>
+                )}
+              </div>
+            </ScrollReveal>
+          )}
+
+          <div className="mt-4">
             <HeartFlourish />
           </div>
         </header>
 
         {/* SECTION: DETAIL MEMPELAI */}
-        <section id="section-mempelai" className="my-8 scroll-mt-6">
-          <SectionTitle title="KEDUA MEMPELAI" subtitle="Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan" />
+        <section id="section-mempelai" className="my-10 scroll-mt-6">
+          <ScrollReveal delay={0}>
+            <SectionTitle
+              title="KEDUA MEMPELAI"
+              subtitle="Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan"
+            />
+          </ScrollReveal>
 
-          <p className="font-hand text-xs sm:text-sm text-stone-600 text-center max-w-sm mx-auto mb-6 px-2">
-            Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud menyelenggarakan pernikahan putra-putri kami:
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 max-w-lg mx-auto">
-            {/* Card Mempelai Pria */}
-            <div className="bg-[#fefdfb] border-2 border-stone-800 rounded-2xl p-5 shadow-xs text-center flex flex-col items-center relative">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2d3136] text-amber-200 border border-stone-800 font-hand font-bold text-[11px] px-3 py-0.5 rounded-full shadow-xs">
-                Mempelai Pria
-              </span>
-              <div className="mt-2 flex items-center justify-center">
-                {data.groomAnimationUrl ? (
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-stone-800 overflow-hidden bg-white shadow-xs p-1">
-                    <img
-                      src={data.groomAnimationUrl}
-                      alt={data.groomFullName}
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                ) : (
-                  <GroomAvatar />
-                )}
-              </div>
-              <h3 className="font-hand font-extrabold text-xl sm:text-2xl text-stone-900 mt-3">
-                {data.groomFullName}
-              </h3>
-              <p className="font-hand text-xs sm:text-sm text-stone-600 mt-1 max-w-[220px] leading-relaxed">
-                {data.groomParents}
-              </p>
-              {data.groomInstagram && (
-                <a
-                  href={`https://instagram.com/${data.groomInstagram.replace('@', '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-hand font-bold text-stone-700 hover:text-stone-950 bg-stone-100 hover:bg-stone-200 border border-stone-400 px-3 py-1 rounded-full transition-colors cursor-pointer"
-                >
-                  <Instagram className="w-3.5 h-3.5 text-pink-600" />
-                  <span>@{data.groomInstagram.replace('@', '')}</span>
-                </a>
+          {/* Salam & Kalimat Pembuka */}
+          <ScrollReveal delay={120}>
+            <div className="text-center max-w-md mx-auto mb-6 px-2 space-y-1.5">
+              {data.greetingSalam && (
+                <p className="font-hand font-extrabold text-stone-900 text-sm sm:text-base">
+                  {data.greetingSalam}
+                </p>
+              )}
+              {data.greetingOpening && (
+                <p className="font-hand text-xs sm:text-sm text-stone-600 leading-relaxed">
+                  {data.greetingOpening}
+                </p>
               )}
             </div>
+          </ScrollReveal>
+
+          {/* Staggered Couple Cards (Groom then Bride) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-lg mx-auto">
+            {/* Card Mempelai Pria */}
+            <ScrollReveal delay={240} direction="left">
+              <div className="relative bg-gradient-to-b from-[#ffffff] to-[#fdfbf6] border-2 border-stone-800 rounded-2xl p-5 shadow-[4px_5px_0px_#231f1d] hover:shadow-[6px_7px_0px_#231f1d] transition-all hover:-translate-y-1 text-center flex flex-col items-center group">
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#2d3136] text-amber-200 border-2 border-stone-800 font-hand font-bold text-[11px] px-3.5 py-0.5 rounded-full shadow-[2px_2px_0px_#141110]">
+                  Mempelai Pria
+                </span>
+                <div className="mt-3 flex items-center justify-center">
+                  {data.groomAnimationUrl ? (
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-stone-800 overflow-hidden bg-white shadow-[2px_3px_0px_#231f1d] p-1">
+                      <img
+                        src={data.groomAnimationUrl}
+                        alt={data.groomFullName}
+                        className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform"
+                      />
+                    </div>
+                  ) : (
+                    <GroomAvatar />
+                  )}
+                </div>
+                <h3 className="font-hand font-extrabold text-xl sm:text-2xl text-stone-900 mt-3.5">
+                  {data.groomFullName || data.groomName}
+                </h3>
+                <p className="font-hand text-xs sm:text-sm text-stone-600 mt-1 max-w-[220px] leading-relaxed">
+                  {data.groomParents}
+                </p>
+                {data.groomInstagram && data.groomInstagram !== '--' && (
+                  <a
+                    href={`https://instagram.com/${data.groomInstagram.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-hand font-bold text-stone-800 hover:text-stone-950 bg-stone-100 hover:bg-amber-100 border-2 border-stone-800 px-3.5 py-1 rounded-full shadow-[2px_2px_0px_#231f1d] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                  >
+                    <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                    <span>@{data.groomInstagram.replace('@', '')}</span>
+                  </a>
+                )}
+              </div>
+            </ScrollReveal>
 
             {/* Card Mempelai Wanita */}
-            <div className="bg-[#fefdfb] border-2 border-stone-800 rounded-2xl p-5 shadow-xs text-center flex flex-col items-center relative">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2d3136] text-amber-200 border border-stone-800 font-hand font-bold text-[11px] px-3 py-0.5 rounded-full shadow-xs">
-                Mempelai Wanita
-              </span>
-              <div className="mt-2 flex items-center justify-center">
-                {data.brideAnimationUrl ? (
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-stone-800 overflow-hidden bg-white shadow-xs p-1">
-                    <img
-                      src={data.brideAnimationUrl}
-                      alt={data.brideFullName}
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                ) : (
-                  <BrideAvatar />
+            <ScrollReveal delay={380} direction="right">
+              <div className="relative bg-gradient-to-b from-[#ffffff] to-[#fdfbf6] border-2 border-stone-800 rounded-2xl p-5 shadow-[4px_5px_0px_#231f1d] hover:shadow-[6px_7px_0px_#231f1d] transition-all hover:-translate-y-1 text-center flex flex-col items-center group">
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#2d3136] text-amber-200 border-2 border-stone-800 font-hand font-bold text-[11px] px-3.5 py-0.5 rounded-full shadow-[2px_2px_0px_#141110]">
+                  Mempelai Wanita
+                </span>
+                <div className="mt-3 flex items-center justify-center">
+                  {data.brideAnimationUrl ? (
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-stone-800 overflow-hidden bg-white shadow-[2px_3px_0px_#231f1d] p-1">
+                      <img
+                        src={data.brideAnimationUrl}
+                        alt={data.brideFullName}
+                        className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform"
+                      />
+                    </div>
+                  ) : (
+                    <BrideAvatar />
+                  )}
+                </div>
+                <h3 className="font-hand font-extrabold text-xl sm:text-2xl text-stone-900 mt-3.5">
+                  {data.brideFullName || data.brideName}
+                </h3>
+                <p className="font-hand text-xs sm:text-sm text-stone-600 mt-1 max-w-[220px] leading-relaxed">
+                  {data.brideParents}
+                </p>
+                {data.brideInstagram && data.brideInstagram !== '--' && (
+                  <a
+                    href={`https://instagram.com/${data.brideInstagram.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-hand font-bold text-stone-800 hover:text-stone-950 bg-stone-100 hover:bg-amber-100 border-2 border-stone-800 px-3.5 py-1 rounded-full shadow-[2px_2px_0px_#231f1d] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                  >
+                    <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                    <span>@{data.brideInstagram.replace('@', '')}</span>
+                  </a>
                 )}
               </div>
-              <h3 className="font-hand font-extrabold text-xl sm:text-2xl text-stone-900 mt-3">
-                {data.brideFullName}
-              </h3>
-              <p className="font-hand text-xs sm:text-sm text-stone-600 mt-1 max-w-[220px] leading-relaxed">
-                {data.brideParents}
-              </p>
-              {data.brideInstagram && (
-                <a
-                  href={`https://instagram.com/${data.brideInstagram.replace('@', '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-hand font-bold text-stone-700 hover:text-stone-950 bg-stone-100 hover:bg-stone-200 border border-stone-400 px-3 py-1 rounded-full transition-colors cursor-pointer"
-                >
-                  <Instagram className="w-3.5 h-3.5 text-pink-600" />
-                  <span>@{data.brideInstagram.replace('@', '')}</span>
-                </a>
-              )}
-            </div>
+            </ScrollReveal>
           </div>
 
           <div className="flex items-center justify-center gap-3 my-6">
-            <span className="h-px w-12 bg-stone-400"></span>
-            <span className="font-hand font-bold text-stone-500 text-sm">&amp;</span>
-            <span className="h-px w-12 bg-stone-400"></span>
+            <span className="h-0.5 w-12 bg-stone-400 rounded-full"></span>
+            <span className="font-hand font-bold text-stone-600 text-base">&amp;</span>
+            <span className="h-0.5 w-12 bg-stone-400 rounded-full"></span>
           </div>
         </section>
 
         {/* SECTION: OUR STORY */}
-        <section id="section-story" className="my-8 scroll-mt-6">
-          <SectionTitle title="OUR STORY" subtitle="Kisah sederhana kami" />
+        <section id="section-story" className="my-10 scroll-mt-6">
+          <ScrollReveal delay={0}>
+            <SectionTitle
+              title={data.storyTitle || 'OUR STORY'}
+              subtitle={data.storySubtitle || 'Kisah sederhana kami'}
+            />
+          </ScrollReveal>
 
-          {/* 4. Animasi / Bahan Our Story */}
-          {data.ourStoryAnimationUrl ? (
-            <div className="max-w-md mx-auto rounded-xl border-2 border-stone-800 overflow-hidden shadow-xs bg-white p-2">
-              <img
-                src={data.ourStoryAnimationUrl}
-                alt="Animasi Our Story"
-                className="w-full max-h-72 object-contain mx-auto rounded-lg"
-              />
-            </div>
-          ) : (
-            <CoupleStoryIllustration />
-          )}
+          {/* Animasi / Ilustrasi Our Story */}
+          <ScrollReveal delay={140}>
+            {data.ourStoryAnimationUrl ? (
+              <div className="max-w-md mx-auto rounded-2xl border-2 border-stone-800 overflow-hidden shadow-[4px_5px_0px_#231f1d] bg-white p-2">
+                <img
+                  src={data.ourStoryAnimationUrl}
+                  alt="Animasi Our Story"
+                  className="w-full max-h-72 object-contain mx-auto rounded-xl"
+                />
+              </div>
+            ) : (
+              <div className="max-w-md mx-auto">
+                <CoupleStoryIllustration />
+              </div>
+            )}
+          </ScrollReveal>
 
-          <div className="text-center mt-5 max-w-md mx-auto bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-4 shadow-xs">
-            <h3 className="font-hand font-bold text-xl text-stone-900 mb-1">
-              {data.groomName} &amp; {data.brideName}
-            </h3>
-            <p className="font-hand text-sm sm:text-base text-stone-700 leading-relaxed text-justify sm:text-center">
-              {data.ourStory}
-            </p>
-            <div className="flex items-center justify-center gap-2 mt-3">
-              <span className="h-px w-8 bg-stone-400"></span>
-              <HeartFlourish />
-              <span className="h-px w-8 bg-stone-400"></span>
+          {/* Story Narrative Box */}
+          <ScrollReveal delay={280}>
+            <div className="relative text-center mt-5 max-w-md mx-auto bg-gradient-to-b from-[#ffffff] to-[#faf5ec] border-2 border-stone-800 rounded-2xl p-5 sm:p-6 shadow-[4px_5px_0px_#231f1d]">
+              <div className="washi-tape-strip" />
+              <h3 className="font-hand font-extrabold text-xl text-stone-900 mb-2">
+                {data.groomName} &amp; {data.brideName}
+              </h3>
+              <p className="font-hand text-sm sm:text-base text-stone-700 leading-relaxed text-justify sm:text-center">
+                {data.ourStory}
+              </p>
+              <div className="flex items-center justify-center gap-2 mt-4">
+                <span className="h-px w-8 bg-stone-400"></span>
+                <HeartFlourish />
+                <span className="h-px w-8 bg-stone-400"></span>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </section>
 
         {/* SECTION: DETAIL ACARA */}
         <section id="section-acara" className="my-10 scroll-mt-6">
-          <SectionTitle title="DETAIL ACARA" subtitle="Mohon hadir di hari bahagia kami" />
+          <ScrollReveal delay={0}>
+            <SectionTitle
+              title={data.eventSectionTitle || 'DETAIL ACARA'}
+              subtitle={data.eventSectionSubtitle || 'Mohon hadir di hari bahagia kami'}
+            />
+          </ScrollReveal>
 
-          {/* 5. Animasi / Bahan Detail Acara (Jika diisi) */}
+          {/* Animasi Detail Acara jika diisi */}
           {data.eventDetailAnimationUrl && (
-            <div className="flex justify-center mb-4">
-              <div className="max-w-xs rounded-xl border-2 border-stone-800 overflow-hidden shadow-xs bg-white p-2">
-                <img
-                  src={data.eventDetailAnimationUrl}
-                  alt="Animasi Detail Acara"
-                  className="w-full max-h-48 object-contain mx-auto rounded-lg"
-                />
+            <ScrollReveal delay={120}>
+              <div className="flex justify-center mb-4">
+                <div className="max-w-xs rounded-2xl border-2 border-stone-800 overflow-hidden shadow-[3px_4px_0px_#231f1d] bg-white p-2">
+                  <img
+                    src={data.eventDetailAnimationUrl}
+                    alt="Animasi Detail Acara"
+                    className="w-full max-h-48 object-contain mx-auto rounded-xl"
+                  />
+                </div>
               </div>
-            </div>
+            </ScrollReveal>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
+          {/* Staggered Event Cards (Akad then Resepsi) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-lg mx-auto">
             {/* Card 1: Akad Nikah */}
-            <div className="bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-4 shadow-xs flex flex-col justify-between">
-              <div>
-                {/* Rings Icon */}
-                <div className="flex justify-center mb-2">
-                  <div className="relative w-10 h-7">
-                    <div className="absolute left-0 w-6 h-6 rounded-full border-2 border-amber-600/90 bg-amber-100/40"></div>
-                    <div className="absolute right-0 w-6 h-6 rounded-full border-2 border-amber-600/90 bg-amber-100/40"></div>
+            <ScrollReveal delay={200} direction="up">
+              <div className="relative bg-gradient-to-b from-[#ffffff] to-[#fbf8f2] border-2 border-stone-800 rounded-2xl p-5 shadow-[4px_5px_0px_#231f1d] hover:shadow-[6px_7px_0px_#231f1d] transition-all hover:-translate-y-1 flex flex-col justify-between h-full">
+                <div>
+                  {/* Rings Icon with Badge */}
+                  <div className="flex justify-center mb-2">
+                    <div className="relative w-11 h-8">
+                      <div className="absolute left-0 w-6 h-6 rounded-full border-2 border-amber-600 bg-amber-100 shadow-xs"></div>
+                      <div className="absolute right-0 w-6 h-6 rounded-full border-2 border-amber-600 bg-amber-100 shadow-xs"></div>
+                    </div>
                   </div>
-                </div>
-                <h3 className="font-hand font-bold text-lg text-center text-stone-900 mb-3">
-                  Akad Nikah
-                </h3>
+                  <h3 className="font-hand font-extrabold text-xl text-center text-stone-900 mb-3 border-b-2 border-dashed border-stone-300 pb-2">
+                    {data.akadTitle || 'Akad Nikah'}
+                  </h3>
 
-                <div className="space-y-2 text-xs sm:text-sm font-hand">
-                  <div className="flex items-start gap-2 text-stone-700">
-                    <Calendar className="w-4 h-4 shrink-0 mt-0.5 text-stone-800" />
-                    <div>
-                      <p className="font-bold text-stone-900">Hari, Tanggal</p>
-                      <p>{data.weddingDate}</p>
+                  <div className="space-y-2.5 text-xs sm:text-sm font-hand">
+                    <div className="flex items-start gap-2.5 text-stone-700">
+                      <div className="p-1 rounded-md bg-amber-100 border border-stone-700 shrink-0 mt-0.5">
+                        <Calendar className="w-3.5 h-3.5 text-stone-800" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-stone-900">Hari &amp; Tanggal</p>
+                        <p>{data.akadDate || data.weddingDateFull}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-2 text-stone-700">
-                    <Clock className="w-4 h-4 shrink-0 mt-0.5 text-stone-800" />
-                    <div>
-                      <p className="font-bold text-stone-900">Waktu</p>
-                      <p>{data.akadTime}</p>
+                    <div className="flex items-start gap-2.5 text-stone-700">
+                      <div className="p-1 rounded-md bg-amber-100 border border-stone-700 shrink-0 mt-0.5">
+                        <Clock className="w-3.5 h-3.5 text-stone-800" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-stone-900">Waktu</p>
+                        <p>{data.akadTime}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-2 text-stone-700">
-                    <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-stone-800" />
-                    <div>
-                      <p className="font-bold text-stone-900">Tempat</p>
-                      <p>{data.venueName}</p>
+                    <div className="flex items-start gap-2.5 text-stone-700">
+                      <div className="p-1 rounded-md bg-amber-100 border border-stone-700 shrink-0 mt-0.5">
+                        <MapPin className="w-3.5 h-3.5 text-stone-800" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-stone-900">{data.akadVenue || 'Tempat'}</p>
+                        <p className="text-stone-600 text-xs">{data.akadAddress || data.venueAddress}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
 
             {/* Card 2: Resepsi */}
-            <div className="bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-4 shadow-xs flex flex-col justify-between">
-              <div>
-                {/* Clinking Glasses Icon */}
-                <div className="flex justify-center mb-2">
-                  <svg width="32" height="28" viewBox="0 0 32 28" fill="none">
-                    {/* Glass 1 tilted right */}
-                    <g transform="rotate(15 12 12)">
-                      <path d="M7 4 L17 4 L14 13 C13.5 15 10.5 15 10 13 Z" fill="#fff9e6" stroke="#222" strokeWidth="1.8" />
-                      <line x1="12" y1="14" x2="12" y2="22" stroke="#222" strokeWidth="1.8" />
-                      <line x1="8" y1="22" x2="16" y2="22" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
-                    </g>
-                    {/* Glass 2 tilted left */}
-                    <g transform="rotate(-15 20 12)">
-                      <path d="M15 4 L25 4 L22 13 C21.5 15 18.5 15 18 13 Z" fill="#fff9e6" stroke="#222" strokeWidth="1.8" />
-                      <line x1="20" y1="14" x2="20" y2="22" stroke="#222" strokeWidth="1.8" />
-                      <line x1="16" y1="22" x2="24" y2="22" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
-                    </g>
-                    {/* Clink sparkles */}
-                    <circle cx="16" cy="6" r="1.5" fill="#d97a68" />
-                  </svg>
-                </div>
-                <h3 className="font-hand font-bold text-lg text-center text-stone-900 mb-3">
-                  Resepsi
-                </h3>
+            <ScrollReveal delay={360} direction="up">
+              <div className="relative bg-gradient-to-b from-[#ffffff] to-[#fbf8f2] border-2 border-stone-800 rounded-2xl p-5 shadow-[4px_5px_0px_#231f1d] hover:shadow-[6px_7px_0px_#231f1d] transition-all hover:-translate-y-1 flex flex-col justify-between h-full">
+                <div>
+                  {/* Clinking Glasses Icon */}
+                  <div className="flex justify-center mb-2">
+                    <svg width="32" height="28" viewBox="0 0 32 28" fill="none">
+                      <g transform="rotate(15 12 12)">
+                        <path d="M7 4 L17 4 L14 13 C13.5 15 10.5 15 10 13 Z" fill="#fff9e6" stroke="#222" strokeWidth="1.8" />
+                        <line x1="12" y1="14" x2="12" y2="22" stroke="#222" strokeWidth="1.8" />
+                        <line x1="8" y1="22" x2="16" y2="22" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
+                      </g>
+                      <g transform="rotate(-15 20 12)">
+                        <path d="M15 4 L25 4 L22 13 C21.5 15 18.5 15 18 13 Z" fill="#fff9e6" stroke="#222" strokeWidth="1.8" />
+                        <line x1="20" y1="14" x2="20" y2="22" stroke="#222" strokeWidth="1.8" />
+                        <line x1="16" y1="22" x2="24" y2="22" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
+                      </g>
+                      <circle cx="16" cy="6" r="1.5" fill="#d97a68" />
+                    </svg>
+                  </div>
+                  <h3 className="font-hand font-extrabold text-xl text-center text-stone-900 mb-3 border-b-2 border-dashed border-stone-300 pb-2">
+                    {data.resepsiTitle || 'Resepsi'}
+                  </h3>
 
-                <div className="space-y-2 text-xs sm:text-sm font-hand">
-                  <div className="flex items-start gap-2 text-stone-700">
-                    <Calendar className="w-4 h-4 shrink-0 mt-0.5 text-stone-800" />
-                    <div>
-                      <p className="font-bold text-stone-900">Hari, Tanggal</p>
-                      <p>{data.weddingDate}</p>
+                  <div className="space-y-2.5 text-xs sm:text-sm font-hand">
+                    <div className="flex items-start gap-2.5 text-stone-700">
+                      <div className="p-1 rounded-md bg-amber-100 border border-stone-700 shrink-0 mt-0.5">
+                        <Calendar className="w-3.5 h-3.5 text-stone-800" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-stone-900">Hari &amp; Tanggal</p>
+                        <p>{data.resepsiDate || data.weddingDateFull}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-2 text-stone-700">
-                    <Clock className="w-4 h-4 shrink-0 mt-0.5 text-stone-800" />
-                    <div>
-                      <p className="font-bold text-stone-900">Waktu</p>
-                      <p>{data.resepsiTime}</p>
+                    <div className="flex items-start gap-2.5 text-stone-700">
+                      <div className="p-1 rounded-md bg-amber-100 border border-stone-700 shrink-0 mt-0.5">
+                        <Clock className="w-3.5 h-3.5 text-stone-800" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-stone-900">Waktu</p>
+                        <p>{data.resepsiTime}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-2 text-stone-700">
-                    <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-stone-800" />
-                    <div>
-                      <p className="font-bold text-stone-900">Tempat</p>
-                      <p>{data.venueName}</p>
+                    <div className="flex items-start gap-2.5 text-stone-700">
+                      <div className="p-1 rounded-md bg-amber-100 border border-stone-700 shrink-0 mt-0.5">
+                        <MapPin className="w-3.5 h-3.5 text-stone-800" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-stone-900">{data.resepsiVenue || data.venueName}</p>
+                        <p className="text-stone-600 text-xs">{data.resepsiAddress || data.venueAddress}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
         {/* SECTION: LOKASI */}
         <section id="section-lokasi" className="my-10 scroll-mt-6">
-          <SectionTitle title="LOKASI" subtitle="Lokasi acara pernikahan" />
+          <ScrollReveal delay={0}>
+            <SectionTitle
+              title={data.locationSectionTitle || 'LOKASI'}
+              subtitle={data.locationSectionSubtitle || 'Lokasi acara pernikahan'}
+            />
+          </ScrollReveal>
 
-          <div className="max-w-md mx-auto">
-            <MapIllustration />
-
-            <div className="bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-4 mt-3 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-              <div>
-                <h3 className="font-hand font-bold text-base sm:text-lg text-stone-900">
-                  {data.venueName}
-                </h3>
-                <p className="font-hand text-xs sm:text-sm text-stone-600">
-                  {data.venueAddress}
-                </p>
+          <div className="max-w-md mx-auto space-y-4">
+            <ScrollReveal delay={150}>
+              <div className="rounded-2xl border-2 border-stone-800 overflow-hidden shadow-[4px_5px_0px_#231f1d]">
+                <MapIllustration />
               </div>
+            </ScrollReveal>
 
-              <a
-                href={data.googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#2d3136] hover:bg-stone-900 active:scale-95 text-stone-100 font-hand font-bold text-xs sm:text-sm px-4 py-2 rounded-full border border-stone-800 shadow-xs transition-all cursor-pointer whitespace-nowrap"
-              >
-                <MapPin className="w-4 h-4 text-amber-200" />
-                <span>Buka Google Maps</span>
-              </a>
-            </div>
+            <ScrollReveal delay={300}>
+              <div className="bg-gradient-to-b from-[#ffffff] to-[#faf6ef] border-2 border-stone-800 rounded-2xl p-5 shadow-[4px_5px_0px_#231f1d] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+                <div>
+                  <h3 className="font-hand font-extrabold text-lg sm:text-xl text-stone-900">
+                    {data.venueName}
+                  </h3>
+                  <p className="font-hand text-xs sm:text-sm text-stone-600 mt-0.5">
+                    {data.venueAddress}
+                  </p>
+                </div>
+
+                <a
+                  href={data.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-[#2d3136] hover:bg-stone-900 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-stone-100 font-hand font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full border-2 border-stone-800 shadow-[3px_3px_0px_#141110] transition-all cursor-pointer whitespace-nowrap"
+                >
+                  <MapPin className="w-4 h-4 text-amber-200" />
+                  <span>{data.googleMapsButtonText || 'Buka Google Maps'}</span>
+                </a>
+              </div>
+            </ScrollReveal>
           </div>
         </section>
 
         {/* SECTION: GALERI FOTO */}
         <section id="section-galeri" className="my-10 scroll-mt-6">
-          <SectionTitle title="GALERI FOTO" subtitle="Momen-momen indah kami" />
+          <ScrollReveal delay={0}>
+            <SectionTitle
+              title={data.gallerySectionTitle || 'GALERI FOTO'}
+              subtitle={data.gallerySectionSubtitle || 'Momen-momen indah kami'}
+            />
+          </ScrollReveal>
 
-          {/* 6. Animasi / Bahan Galeri Foto (Jika diisi) */}
+          {/* Animasi Galeri Foto jika diisi */}
           {data.galleryAnimationUrl && (
-            <div className="mb-5 max-w-sm mx-auto rounded-xl border-2 border-stone-800 overflow-hidden shadow-xs bg-white p-2">
-              <img
-                src={data.galleryAnimationUrl}
-                alt="Animasi Galeri Foto"
-                className="w-full max-h-60 object-contain mx-auto rounded-lg"
-              />
-            </div>
+            <ScrollReveal delay={120}>
+              <div className="mb-5 max-w-sm mx-auto rounded-2xl border-2 border-stone-800 overflow-hidden shadow-[4px_5px_0px_#231f1d] bg-white p-2">
+                <img
+                  src={data.galleryAnimationUrl}
+                  alt="Animasi Galeri Foto"
+                  className="w-full max-h-60 object-contain mx-auto rounded-xl"
+                />
+              </div>
+            </ScrollReveal>
           )}
 
-          <PolaroidGallery onSelect={(idx) => setSelectedPhoto(idx)} />
+          {/* Polaroid Photos Grid */}
+          <ScrollReveal delay={240}>
+            <PolaroidGallery
+              customPhotos={customGalleryList}
+              onSelect={(idx) => setSelectedPhoto(idx)}
+            />
+          </ScrollReveal>
         </section>
 
         {/* SECTION: KONFIRMASI KEHADIRAN (RSVP) */}
         <section id="section-rsvp" className="my-10 scroll-mt-6">
-          <SectionTitle title="KONFIRMASI KEHADIRAN" subtitle="Mohon konfirmasi kehadiran Anda" />
+          <ScrollReveal delay={0}>
+            <SectionTitle
+              title={data.rsvpSectionTitle || 'KONFIRMASI KEHADIRAN'}
+              subtitle={data.rsvpSectionSubtitle || 'Mohon konfirmasi kehadiran Anda'}
+            />
+          </ScrollReveal>
 
-          <div className="bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-5 shadow-xs max-w-md mx-auto">
-            {rsvpSubmitted ? (
-              <div className="text-center py-6">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 border-2 border-emerald-600 flex items-center justify-center mx-auto mb-3">
-                  <Check className="w-6 h-6 text-emerald-700" />
-                </div>
-                <h3 className="font-hand font-bold text-lg text-stone-900">
-                  Terima Kasih, {rsvpName}!
-                </h3>
-                <p className="font-hand text-sm text-stone-600 mt-1">
-                  Konfirmasi kehadiran Anda telah berhasil tersimpan.
+          <ScrollReveal delay={200}>
+            <div className="relative bg-gradient-to-b from-[#ffffff] to-[#faf6ee] border-2 border-stone-800 rounded-2xl p-5 sm:p-6 shadow-[4px_5px_0px_#231f1d] max-w-md mx-auto">
+              <div className="washi-tape-strip" />
+
+              {data.rsvpNotice && (
+                <p className="font-hand text-xs text-stone-600 text-center mb-4 italic">
+                  {data.rsvpNotice}
                 </p>
-              </div>
-            ) : (
-              <form onSubmit={handleRsvpSubmit} className="space-y-4 font-hand">
-                {/* Nama */}
-                <div>
-                  <label htmlFor="rsvp-name" className="block text-sm font-bold text-stone-800 mb-1">
-                    Nama
-                  </label>
-                  <input
-                    id="rsvp-name"
-                    type="text"
-                    required
-                    value={rsvpName}
-                    onChange={(e) => setRsvpName(e.target.value)}
-                    placeholder="Contoh: Andi Pratama"
-                    className="w-full bg-[#fcf9f2] border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 outline-hidden transition-colors"
-                  />
-                </div>
+              )}
 
-                {/* Kehadiran */}
-                <div>
-                  <label className="block text-sm font-bold text-stone-800 mb-1.5">
-                    Apakah Anda bisa hadir?
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setAttendance('hadir')}
-                      className={`py-2 px-3 rounded-lg border-2 font-bold text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
-                        attendance === 'hadir'
-                          ? 'bg-[#80766a] text-white border-stone-800'
-                          : 'bg-white text-stone-700 border-stone-300 hover:bg-stone-50'
-                      }`}
-                    >
-                      {attendance === 'hadir' && <Check className="w-4 h-4" />}
-                      <span>Bisa hadir</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAttendance('tidak')}
-                      className={`py-2 px-3 rounded-lg border-2 font-bold text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
-                        attendance === 'tidak'
-                          ? 'bg-[#80766a] text-white border-stone-800'
-                          : 'bg-white text-stone-700 border-stone-300 hover:bg-stone-50'
-                      }`}
-                    >
-                      {attendance === 'tidak' && <Check className="w-4 h-4" />}
-                      <span>Tidak bisa</span>
-                    </button>
+              {rsvpSubmitted ? (
+                <div className="text-center py-6">
+                  <div className="w-12 h-12 rounded-full bg-emerald-100 border-2 border-emerald-600 flex items-center justify-center mx-auto mb-3 shadow-xs">
+                    <Check className="w-6 h-6 text-emerald-700" />
                   </div>
+                  <h3 className="font-hand font-extrabold text-xl text-stone-900">
+                    Terima Kasih, {rsvpName}!
+                  </h3>
+                  <p className="font-hand text-sm text-stone-600 mt-1">
+                    Konfirmasi kehadiran Anda telah berhasil tersimpan.
+                  </p>
                 </div>
-
-                {/* Jumlah Tamu */}
-                {attendance === 'hadir' && (
+              ) : (
+                <form onSubmit={handleRsvpSubmit} className="space-y-4 font-hand">
+                  {/* Nama */}
                   <div>
-                    <label className="block text-sm font-bold text-stone-800 mb-1">
-                      Jumlah Tamu
+                    <label htmlFor="rsvp-name" className="block text-sm font-bold text-stone-800 mb-1">
+                      Nama Lengkap
                     </label>
-                    <div className="flex items-center border-2 border-stone-400 rounded-lg bg-[#fcf9f2] overflow-hidden w-36">
+                    <input
+                      id="rsvp-name"
+                      type="text"
+                      required
+                      value={rsvpName}
+                      onChange={(e) => setRsvpName(e.target.value)}
+                      placeholder="Contoh: Andi Pratama"
+                      className="w-full bg-[#fcf9f2] border-2 border-stone-400 focus:border-stone-800 rounded-xl px-3.5 py-2 text-sm text-stone-900 placeholder:text-stone-400 outline-hidden transition-colors shadow-inner"
+                    />
+                  </div>
+
+                  {/* Kehadiran */}
+                  <div>
+                    <label className="block text-sm font-bold text-stone-800 mb-1.5">
+                      Apakah Anda bisa hadir?
+                    </label>
+                    <div className="grid grid-cols-2 gap-2.5">
                       <button
                         type="button"
-                        onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
-                        className="px-3 py-1.5 text-stone-700 hover:bg-stone-200 active:bg-stone-300 font-bold text-base transition-colors"
+                        onClick={() => setAttendance('hadir')}
+                        className={`py-2.5 px-3 rounded-xl border-2 font-bold text-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          attendance === 'hadir'
+                            ? 'bg-[#2d3136] text-amber-200 border-stone-800 shadow-[2px_3px_0px_#141110]'
+                            : 'bg-white text-stone-700 border-stone-300 hover:bg-stone-50'
+                        }`}
                       >
-                        -
+                        {attendance === 'hadir' && <Check className="w-4 h-4" />}
+                        <span>Bisa hadir</span>
                       </button>
-                      <span className="flex-1 text-center font-bold text-stone-900 text-sm">
-                        {guestCount}
-                      </span>
                       <button
                         type="button"
-                        onClick={() => setGuestCount(guestCount + 1)}
-                        className="px-3 py-1.5 text-stone-700 hover:bg-stone-200 active:bg-stone-300 font-bold text-base transition-colors"
+                        onClick={() => setAttendance('tidak')}
+                        className={`py-2.5 px-3 rounded-xl border-2 font-bold text-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          attendance === 'tidak'
+                            ? 'bg-[#2d3136] text-amber-200 border-stone-800 shadow-[2px_3px_0px_#141110]'
+                            : 'bg-white text-stone-700 border-stone-300 hover:bg-stone-50'
+                        }`}
                       >
-                        +
+                        {attendance === 'tidak' && <Check className="w-4 h-4" />}
+                        <span>Tidak bisa</span>
                       </button>
                     </div>
                   </div>
-                )}
 
-                {/* Submit button */}
-                <div className="pt-1">
-                  <button
-                    type="submit"
-                    className="w-full bg-[#2d3136] hover:bg-stone-900 active:scale-98 text-white font-bold text-sm py-2.5 px-4 rounded-xl border-2 border-stone-800 flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>Kirim Konfirmasi</span>
-                  </button>
+                  {/* Jumlah Tamu */}
+                  {attendance === 'hadir' && (
+                    <div>
+                      <label className="block text-sm font-bold text-stone-800 mb-1">
+                        Jumlah Tamu
+                      </label>
+                      <div className="flex items-center border-2 border-stone-400 rounded-xl bg-[#fcf9f2] overflow-hidden w-36 shadow-xs">
+                        <button
+                          type="button"
+                          onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
+                          className="px-3.5 py-1.5 text-stone-700 hover:bg-stone-200 active:bg-stone-300 font-bold text-base transition-colors cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="flex-1 text-center font-extrabold text-stone-900 text-sm">
+                          {guestCount}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setGuestCount(guestCount + 1)}
+                          className="px-3.5 py-1.5 text-stone-700 hover:bg-stone-200 active:bg-stone-300 font-bold text-base transition-colors cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Submit button with 3D Depth */}
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      className="w-full bg-[#24292e] hover:bg-stone-900 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-amber-200 hover:text-white font-extrabold text-base py-3 px-4 rounded-xl border-2 border-stone-800 flex items-center justify-center gap-2 shadow-[3px_4px_0px_#141110] transition-all cursor-pointer"
+                    >
+                      <Send className="w-4 h-4 text-amber-300" />
+                      <span>Kirim Konfirmasi</span>
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </ScrollReveal>
+        </section>
+
+        {/* SECTION: HADIAH PERNIKAHAN (WEDDING GIFT) */}
+        <section id="section-gift" className="my-10 scroll-mt-6">
+          <ScrollReveal delay={0}>
+            <SectionTitle
+              title={data.giftSectionTitle || 'WEDDING GIFT'}
+              subtitle={data.giftSectionSubtitle || 'Tanda kasih & doa restu'}
+            />
+          </ScrollReveal>
+
+          <ScrollReveal delay={120}>
+            <p className="font-hand text-xs sm:text-sm text-stone-600 text-center max-w-md mx-auto mb-4 px-2">
+              {data.giftNotice ||
+                'Doa restu Anda merupakan karunia terindah bagi kami. Namun jika Anda ingin memberikan tanda kasih, dapat melalui:'}
+            </p>
+          </ScrollReveal>
+
+          <div className="max-w-md mx-auto space-y-4">
+            {/* Card Rekening 1 */}
+            <ScrollReveal delay={220}>
+              <div className="relative bg-gradient-to-b from-[#ffffff] to-[#faf6ef] border-2 border-stone-800 rounded-2xl p-5 shadow-[4px_5px_0px_#231f1d]">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-100 border-2 border-stone-800 flex items-center justify-center shrink-0 shadow-xs">
+                      <Building2 className="w-6 h-6 text-stone-800" />
+                    </div>
+                    <div>
+                      <p className="font-hand text-xs text-stone-600 font-bold">Transfer Bank / E-Wallet</p>
+                      <h3 className="font-hand font-extrabold text-lg text-stone-900">
+                        {data.bankName}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="text-center sm:text-right w-full sm:w-auto">
+                    <p className="font-hand text-xs text-stone-500 font-bold">No. Rekening</p>
+                    <div className="flex items-center justify-center sm:justify-end gap-2 mt-0.5">
+                      <span className="font-mono font-bold text-sm sm:text-base text-stone-900 tracking-wider">
+                        {data.bankAccountNumber}
+                      </span>
+                      <button
+                        onClick={() => copyAccountNumber(data.bankAccountNumber, false)}
+                        className="inline-flex items-center gap-1 bg-[#f4ece1] hover:bg-stone-200 active:translate-x-0.5 active:translate-y-0.5 text-stone-800 font-hand font-bold text-xs px-2.5 py-1 rounded-md border border-stone-700 shadow-xs transition-all cursor-pointer"
+                      >
+                        {copiedBank ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-700" />
+                            <span className="text-emerald-800">Tersalin!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 text-stone-700" />
+                            <span>Salin</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <p className="font-hand text-xs text-stone-600 mt-1">
+                      a.n. {data.bankAccountHolder}
+                    </p>
+                  </div>
                 </div>
-              </form>
+              </div>
+            </ScrollReveal>
+
+            {/* Card Rekening 2 (Jika diisi) */}
+            {data.bankName2 && data.bankAccountNumber2 && (
+              <ScrollReveal delay={340}>
+                <div className="relative bg-gradient-to-b from-[#ffffff] to-[#faf6ef] border-2 border-stone-800 rounded-2xl p-5 shadow-[4px_5px_0px_#231f1d]">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-amber-100 border-2 border-stone-800 flex items-center justify-center shrink-0 shadow-xs">
+                        <Building2 className="w-6 h-6 text-stone-800" />
+                      </div>
+                      <div>
+                        <p className="font-hand text-xs text-stone-600 font-bold">Transfer Bank / E-Wallet</p>
+                        <h3 className="font-hand font-extrabold text-lg text-stone-900">
+                          {data.bankName2}
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div className="text-center sm:text-right w-full sm:w-auto">
+                      <p className="font-hand text-xs text-stone-500 font-bold">No. Rekening</p>
+                      <div className="flex items-center justify-center sm:justify-end gap-2 mt-0.5">
+                        <span className="font-mono font-bold text-sm sm:text-base text-stone-900 tracking-wider">
+                          {data.bankAccountNumber2}
+                        </span>
+                        <button
+                          onClick={() => copyAccountNumber(data.bankAccountNumber2!, true)}
+                          className="inline-flex items-center gap-1 bg-[#f4ece1] hover:bg-stone-200 active:translate-x-0.5 active:translate-y-0.5 text-stone-800 font-hand font-bold text-xs px-2.5 py-1 rounded-md border border-stone-700 shadow-xs transition-all cursor-pointer"
+                        >
+                          {copiedBank2 ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-700" />
+                              <span className="text-emerald-800">Tersalin!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-stone-700" />
+                              <span>Salin</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <p className="font-hand text-xs text-stone-600 mt-1">
+                        a.n. {data.bankAccountHolder2 || data.bankAccountHolder}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            )}
+
+            {/* Kirim Kado Fisik (Jika diisi alamat) */}
+            {data.giftAddress && (
+              <ScrollReveal delay={440}>
+                <div className="relative bg-gradient-to-b from-[#ffffff] to-[#faf6ef] border-2 border-stone-800 rounded-2xl p-5 shadow-[4px_5px_0px_#231f1d]">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 border-2 border-stone-800 flex items-center justify-center shrink-0 mt-0.5">
+                      <Package className="w-5 h-5 text-stone-800" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="font-hand font-bold text-stone-900 text-sm">
+                          Kirim Kado / Bingkisan Fisik
+                        </p>
+                        <button
+                          onClick={copyAddress}
+                          className="inline-flex items-center gap-1 bg-[#f4ece1] hover:bg-stone-200 text-stone-800 font-hand font-bold text-xs px-2.5 py-1 rounded-md border border-stone-700 shadow-xs cursor-pointer transition-colors"
+                        >
+                          {copiedAddress ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-700" />
+                              <span className="text-emerald-800">Tersalin!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3 text-stone-700" />
+                              <span>Salin Alamat</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <p className="font-hand text-xs text-stone-600 mt-1 leading-relaxed">
+                        {data.giftAddress}
+                      </p>
+                      {data.giftAddressRecipient && (
+                        <p className="font-hand text-xs text-stone-500 mt-0.5 font-bold">
+                          Penerima: {data.giftAddressRecipient}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
             )}
           </div>
         </section>
 
         {/* SECTION: UCAPAN & DOA */}
         <section id="section-ucapan" className="my-10 scroll-mt-6">
-          <SectionTitle title="UCAPAN & DOA" subtitle="Tulis doa dan harapan terbaik untuk kami" />
+          <ScrollReveal delay={0}>
+            <SectionTitle
+              title={data.wishesSectionTitle || 'DOA & UCAPAN'}
+              subtitle={data.wishesSectionSubtitle || 'Tulis doa dan harapan terbaik untuk kami'}
+            />
+          </ScrollReveal>
 
           <div className="max-w-md mx-auto space-y-4">
-            {/* Input Form as shown in Photo 2 */}
-            <form onSubmit={handleAddWish} className="bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-3 shadow-xs flex flex-col gap-2">
-              <input
-                type="text"
-                value={newWishName}
-                onChange={(e) => setNewWishName(e.target.value)}
-                placeholder="Nama Anda (opsional)"
-                className="w-full bg-[#fcf9f2] border border-stone-300 rounded-lg px-3 py-1.5 text-xs font-hand text-stone-900 placeholder:text-stone-400 outline-hidden"
-              />
-              <div className="flex gap-2">
+            {/* Input Form with 3D Depth */}
+            <ScrollReveal delay={140}>
+              <form
+                onSubmit={handleAddWish}
+                className="bg-gradient-to-b from-[#ffffff] to-[#faf6ee] border-2 border-stone-800 rounded-2xl p-4 shadow-[4px_5px_0px_#231f1d] flex flex-col gap-2.5"
+              >
                 <input
                   type="text"
-                  required
-                  value={newWishMessage}
-                  onChange={(e) => setNewWishMessage(e.target.value)}
-                  placeholder="Tulis pesan Anda di sini..."
-                  className="flex-1 bg-[#fcf9f2] border border-stone-300 rounded-lg px-3 py-2 text-xs sm:text-sm font-hand text-stone-900 placeholder:text-stone-400 outline-hidden"
+                  value={newWishName}
+                  onChange={(e) => setNewWishName(e.target.value)}
+                  placeholder="Nama Anda (opsional)"
+                  className="w-full bg-[#fcf9f2] border-2 border-stone-300 focus:border-stone-800 rounded-xl px-3 py-2 text-xs font-hand text-stone-900 placeholder:text-stone-400 outline-hidden transition-colors"
                 />
-                <button
-                  type="submit"
-                  className="bg-[#2d3136] hover:bg-stone-900 text-white px-4 py-2 rounded-lg font-hand font-bold text-xs flex items-center gap-1.5 border border-stone-800 transition-colors cursor-pointer shrink-0"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Kirim</span>
-                </button>
-              </div>
-            </form>
-
-            {/* List of Greetings */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              {wishes.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-3 shadow-xs flex flex-col justify-between"
-                >
-                  <p className="font-hand text-xs text-stone-800 leading-snug">
-                    {item.message}
-                  </p>
-                  <p className="font-hand font-bold text-right text-xs text-stone-600 mt-2">
-                    - {item.name}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION: KADO PERNIKAHAN */}
-        <section id="section-gift" className="my-10 scroll-mt-6">
-          <SectionTitle title="KADO PERNIKAHAN" subtitle="Bagi yang ingin memberikan hadiah, dapat melalui:" />
-
-          <div className="bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-4 shadow-xs max-w-md mx-auto">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 border-2 border-stone-800 flex items-center justify-center shrink-0">
-                  <Building2 className="w-6 h-6 text-stone-800" />
-                </div>
-                <div>
-                  <p className="font-hand text-xs text-stone-600 font-bold">Transfer Bank</p>
-                  <h3 className="font-hand font-extrabold text-base text-stone-900">
-                    {data.bankName}
-                  </h3>
-                </div>
-              </div>
-
-              <div className="text-center sm:text-right w-full sm:w-auto">
-                <p className="font-hand text-xs text-stone-500">No. Rekening</p>
-                <div className="flex items-center justify-center sm:justify-end gap-2 mt-0.5">
-                  <span className="font-mono font-bold text-sm sm:text-base text-stone-900 tracking-wider">
-                    {data.bankAccountNumber}
-                  </span>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    required
+                    value={newWishMessage}
+                    onChange={(e) => setNewWishMessage(e.target.value)}
+                    placeholder="Tulis ucapan dan doa Anda di sini..."
+                    className="flex-1 bg-[#fcf9f2] border-2 border-stone-300 focus:border-stone-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-hand text-stone-900 placeholder:text-stone-400 outline-hidden transition-colors"
+                  />
                   <button
-                    onClick={copyAccountNumber}
-                    className="inline-flex items-center gap-1 bg-[#f4ece1] hover:bg-stone-200 active:scale-95 text-stone-800 font-hand font-bold text-xs px-2.5 py-1 rounded-md border border-stone-600 transition-colors cursor-pointer"
+                    type="submit"
+                    className="bg-[#24292e] hover:bg-stone-900 active:translate-x-0.5 active:translate-y-0.5 text-white px-4 py-2 rounded-xl font-hand font-extrabold text-xs flex items-center gap-1.5 border-2 border-stone-800 shadow-[2px_3px_0px_#141110] transition-all cursor-pointer shrink-0"
                   >
-                    {copiedBank ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-700" />
-                        <span className="text-emerald-800">Tersalin!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 text-stone-700" />
-                        <span>Salin</span>
-                      </>
-                    )}
+                    <Send className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Kirim</span>
                   </button>
                 </div>
-                <p className="font-hand text-xs text-stone-600 mt-1">
-                  a.n. {data.bankAccountHolder}
-                </p>
-              </div>
+              </form>
+            </ScrollReveal>
+
+            {/* List of Greetings Staggered One by One */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {wishes.map((item, idx) => (
+                <ScrollReveal key={item.id} delay={220 + idx * 90}>
+                  <div className="bg-gradient-to-b from-[#ffffff] to-[#fcfaf4] border-2 border-stone-800 rounded-2xl p-3.5 shadow-[3px_4px_0px_#231f1d] hover:shadow-[4px_5px_0px_#231f1d] transition-all flex flex-col justify-between h-full">
+                    <p className="font-hand text-xs text-stone-800 leading-snug">
+                      &ldquo;{item.message}&rdquo;
+                    </p>
+                    <p className="font-hand font-bold text-right text-xs text-stone-600 mt-2 border-t border-dashed border-stone-200 pt-1">
+                      - {item.name}
+                    </p>
+                  </div>
+                </ScrollReveal>
+              ))}
             </div>
           </div>
         </section>
 
         {/* FOOTER & CLOSING NOTE */}
         <footer id="invitation-footer" className="text-center pt-8 pb-4">
-          <p className="font-hand text-xs sm:text-sm text-stone-600 max-w-xs mx-auto leading-relaxed">
-            Terima kasih atas doa dan restu yang telah diberikan
-          </p>
-          <h3 className="font-hand font-extrabold text-lg text-stone-900 mt-1">
-            {data.groomName} &amp; {data.brideName}
-          </h3>
-          <div className="mt-1">
-            <HeartFlourish />
-          </div>
+          <ScrollReveal delay={150}>
+            <div className="relative max-w-md mx-auto bg-gradient-to-b from-[#faf6ee] to-[#f3ebe0] border-2 border-stone-800 rounded-2xl p-6 shadow-[4px_5px_0px_#231f1d] mb-6">
+              <div className="washi-tape-strip" />
+              <p className="font-hand text-xs sm:text-sm text-stone-700 leading-relaxed max-w-xs mx-auto">
+                {data.closingText ||
+                  'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu kepada kedua mempelai.'}
+              </p>
+
+              {data.closingSalam && (
+                <p className="font-hand font-extrabold text-sm text-stone-800 mt-3">
+                  {data.closingSalam}
+                </p>
+              )}
+
+              <h3 className="font-hand font-extrabold text-2xl text-stone-900 mt-3">
+                {data.groomName} &amp; {data.brideName}
+              </h3>
+
+              {data.closingFamily && (
+                <p className="font-hand text-xs text-stone-600 mt-1">
+                  {data.closingFamily}
+                </p>
+              )}
+
+              <div className="mt-3">
+                <HeartFlourish />
+              </div>
+            </div>
+          </ScrollReveal>
 
           <div className="mt-4">
             <button
               onClick={onBackToCover}
-              className="font-hand text-xs text-stone-500 hover:text-stone-800 underline cursor-pointer"
+              className="inline-flex items-center gap-1.5 font-hand text-xs text-stone-600 hover:text-stone-900 underline cursor-pointer"
             >
-              Lihat Sampul Komik (Cover)
+              <span>← Kembali ke Sampul Komik (Cover)</span>
             </button>
           </div>
         </footer>
       </div>
 
-      {/* FIXED BOTTOM NAVIGATION BAR (as shown in Photo 2) */}
+      {/* FIXED BOTTOM NAVIGATION BAR */}
       <nav
         id="wedding-bottom-nav"
-        className="fixed bottom-0 left-1/2 -translate-x-1/2 max-w-xl w-full bg-[#faf6ee]/95 backdrop-blur-md border-t-2 border-stone-800 py-2.5 px-6 flex justify-around items-center z-40 shadow-lg"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 max-w-xl w-full bg-[#faf6ee]/95 backdrop-blur-md border-t-2 border-stone-800 py-2 px-6 flex justify-around items-center z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.06)]"
       >
         <button
           onClick={() => {
@@ -768,6 +1058,14 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
         </button>
 
         <button
+          onClick={() => scrollToSection('section-galeri')}
+          className="flex flex-col items-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer"
+        >
+          <span className="text-base">🖼️</span>
+          <span className="font-hand font-bold text-[11px] mt-0.5">Galeri</span>
+        </button>
+
+        <button
           onClick={() => scrollToSection('section-rsvp')}
           className="flex flex-col items-center text-stone-700 hover:text-stone-950 transition-colors cursor-pointer"
         >
@@ -787,23 +1085,33 @@ export function InvitationContent({ onBackToCover, data }: InvitationContentProp
       {/* Photo Lightbox Modal */}
       {selectedPhoto !== null && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in"
           onClick={() => setSelectedPhoto(null)}
         >
           <div
-            className="bg-white p-4 rounded-xl border-2 border-stone-800 max-w-sm w-full shadow-2xl relative"
+            className="bg-white p-4 rounded-2xl border-2 border-stone-800 max-w-sm w-full shadow-[6px_8px_0px_#1c1917] relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="aspect-square bg-stone-100 rounded-lg overflow-hidden border border-stone-300">
-              <PolaroidGallery />
+            <div className="aspect-square bg-stone-100 rounded-xl overflow-hidden border-2 border-stone-800 flex items-center justify-center relative">
+              {customGalleryList[selectedPhoto]?.imageUrl ? (
+                <img
+                  src={customGalleryList[selectedPhoto]!.imageUrl}
+                  alt={customGalleryList[selectedPhoto]?.caption || 'Foto Galeri'}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full p-4 flex items-center justify-center">
+                  <PolaroidGallery customPhotos={customGalleryList} />
+                </div>
+              )}
             </div>
             <div className="text-center mt-3">
-              <p className="font-hand font-bold text-stone-900 text-sm">
-                Galeri Foto Andi &amp; Sinta
+              <p className="font-hand font-extrabold text-stone-900 text-base">
+                {customGalleryList[selectedPhoto]?.caption || `Foto #${selectedPhoto + 1}`}
               </p>
               <button
                 onClick={() => setSelectedPhoto(null)}
-                className="mt-3 bg-stone-800 text-white font-hand font-bold text-xs px-4 py-1.5 rounded-full"
+                className="mt-3 bg-[#24292e] text-amber-200 hover:text-white font-hand font-bold text-xs px-5 py-2 rounded-full border border-stone-800 shadow-xs cursor-pointer"
               >
                 Tutup
               </button>

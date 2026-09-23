@@ -38,7 +38,19 @@ interface CustomizerModalProps {
   onPreviewGuestMode?: (name?: string) => void;
 }
 
-type TabKey = 'mempelai' | 'acara' | 'lokasi' | 'cerita' | 'komik' | 'hadiah' | 'musik' | 'animasi' | 'tamu';
+type TabKey =
+  | 'sampul'
+  | 'mempelai'
+  | 'acara'
+  | 'lokasi'
+  | 'cerita'
+  | 'galeri'
+  | 'komik'
+  | 'hadiah'
+  | 'rsvp'
+  | 'musik'
+  | 'animasi'
+  | 'tamu';
 
 export function CustomizerModal({
   isOpen,
@@ -253,6 +265,18 @@ export function CustomizerModal({
         {/* Tab Navigation */}
         <div className="flex border-b border-stone-300 bg-[#ece4d6] px-3 pt-2 gap-1 overflow-x-auto text-xs sm:text-sm font-bold">
           <button
+            onClick={() => setActiveTab('sampul')}
+            className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'sampul'
+                ? 'bg-[#fcfaf5] text-stone-900 border-t-2 border-x-2 border-stone-800'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <span>Sampul</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('mempelai')}
             className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'mempelai'
@@ -289,6 +313,30 @@ export function CustomizerModal({
           </button>
 
           <button
+            onClick={() => setActiveTab('cerita')}
+            className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'cerita'
+                ? 'bg-[#fcfaf5] text-stone-900 border-t-2 border-x-2 border-stone-800'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5 text-stone-700" />
+            <span>Cerita</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('galeri')}
+            className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'galeri'
+                ? 'bg-[#fcfaf5] text-stone-900 border-t-2 border-x-2 border-stone-800'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <ImageIcon className="w-3.5 h-3.5 text-blue-600" />
+            <span>Galeri</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('komik')}
             className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'komik'
@@ -301,18 +349,6 @@ export function CustomizerModal({
           </button>
 
           <button
-            onClick={() => setActiveTab('cerita')}
-            className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-              activeTab === 'cerita'
-                ? 'bg-[#fcfaf5] text-stone-900 border-t-2 border-x-2 border-stone-800'
-                : 'text-stone-600 hover:text-stone-900'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5 text-stone-700" />
-            <span>Kutipan</span>
-          </button>
-
-          <button
             onClick={() => setActiveTab('hadiah')}
             className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'hadiah'
@@ -321,7 +357,19 @@ export function CustomizerModal({
             }`}
           >
             <CreditCard className="w-3.5 h-3.5 text-stone-700" />
-            <span>Rekening</span>
+            <span>Hadiah</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('rsvp')}
+            className={`px-3 py-2 rounded-t-lg transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'rsvp'
+                ? 'bg-[#fcfaf5] text-stone-900 border-t-2 border-x-2 border-stone-800'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <Send className="w-3.5 h-3.5 text-teal-600" />
+            <span>RSVP &amp; Penutup</span>
           </button>
 
           <button
@@ -363,9 +411,148 @@ export function CustomizerModal({
 
         {/* Tab Content Body */}
         <div className="p-5 overflow-y-auto flex-1 space-y-4">
+          {/* TAB: SAMPUL / COVER */}
+          {activeTab === 'sampul' && (
+            <div className="space-y-4">
+              <div className="bg-amber-50 border-2 border-stone-800 rounded-xl p-3.5 text-stone-900">
+                <h4 className="font-bold text-sm flex items-center gap-1.5 mb-1">
+                  <Sparkles className="w-4 h-4 text-amber-600" />
+                  <span>Kustomisasi Halaman Sampul (Cover Depan)</span>
+                </h4>
+                <p className="text-xs text-stone-600">
+                  Ubah teks judul, tanggal, tombol buka, dan catatan audio di halaman sampul komik.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Judul Utama Sampul (Atas)
+                </label>
+                <input
+                  type="text"
+                  value={formData.coverTitle || 'THE WEDDING OF'}
+                  onChange={(e) => handleChange('coverTitle', e.target.value)}
+                  placeholder="Contoh: THE WEDDING OF"
+                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Tanggal Singkat di Sampul
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.weddingDate}
+                    onChange={(e) => handleChange('weddingDate', e.target.value)}
+                    placeholder="Contoh: 20 . 12 . 2026"
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Subtitle Sampul (Pita Kuning)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.coverSubtitle || 'UNDANGAN PERNIKAHAN SPESIAL'}
+                    onChange={(e) => handleChange('coverSubtitle', e.target.value)}
+                    placeholder="Contoh: UNDANGAN PERNIKAHAN SPESIAL"
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Teks Tombol Buka Undangan
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.coverButtonText || 'Buka Undangan'}
+                    onChange={(e) => handleChange('coverButtonText', e.target.value)}
+                    placeholder="Contoh: Buka Undangan"
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Catatan Audio di Bawah Tombol
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.coverAudioNotice || '*Sentuh tombol untuk membuka & memutar musik'}
+                    onChange={(e) => handleChange('coverAudioNotice', e.target.value)}
+                    placeholder="Contoh: *Sentuh tombol untuk membuka & memutar musik"
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+              </div>
+
+              {/* Opsi Tampilan Bar Browser */}
+              <div className="pt-2 border-t border-stone-300 bg-stone-50 p-3 rounded-xl">
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={formData.showBrowserMockup !== false}
+                    onChange={(e) => handleChange('showBrowserMockup', e.target.checked)}
+                    className="w-4 h-4 mt-0.5 rounded-sm border-stone-400 text-stone-900 focus:ring-0 cursor-pointer"
+                  />
+                  <div>
+                    <span className="font-bold text-xs text-stone-900">
+                      Tampilkan Bingkai Bar Browser Hitam di Sampul (<code className="text-[11px] font-mono">undanganku.com/...</code>)
+                    </span>
+                    <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed">
+                      💡 <em>Ingin tampilan bersih tanpa bar browser?</em> Cukup hilangkan tanda centang ini.
+                    </p>
+                  </div>
+                </label>
+              </div>
+            </div>
+          )}
+
           {/* TAB 1: MEMPELAI */}
           {activeTab === 'mempelai' && (
             <div className="space-y-5">
+              {/* Salam Pembuka */}
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
+                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                  <span>🕊️</span>
+                  <span>Salam &amp; Teks Pembuka Undangan</span>
+                </span>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Salam Pembuka
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.greetingSalam || "Assalamu'alaikum Warahmatullahi Wabarakatuh"}
+                    onChange={(e) => handleChange('greetingSalam', e.target.value)}
+                    placeholder="Contoh: Assalamu'alaikum Warahmatullahi Wabarakatuh"
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Kalimat Sambutan / Pengantar
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={
+                      formData.greetingOpening ||
+                      'Dengan memohon rahmat dan ridho Allah Subhanahu Wa Ta’ala, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri hari bahagia kami:'
+                    }
+                    onChange={(e) => handleChange('greetingOpening', e.target.value)}
+                    placeholder="Kalimat pengantar..."
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+              </div>
+
               {/* Short Names */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -509,62 +696,185 @@ export function CustomizerModal({
 
           {/* TAB 2: ACARA & TANGGAL */}
           {activeTab === 'acara' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 mb-1">
-                    Tanggal Singkat (Titik)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.weddingDate}
-                    onChange={(e) => handleChange('weddingDate', e.target.value)}
-                    placeholder="Contoh: 20 . 12 . 2026"
-                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                  />
-                  <p className="text-[11px] text-stone-500 mt-1">Ditampilkan di bawah judul cover dan kartu acara.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 mb-1">
-                    Tanggal Lengkap
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.weddingDateFull}
-                    onChange={(e) => handleChange('weddingDateFull', e.target.value)}
-                    placeholder="Contoh: Minggu, 20 Desember 2026"
-                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                  />
-                  <p className="text-[11px] text-stone-500 mt-1">Ditampilkan di kolom ringkasan bawah cover.</p>
+            <div className="space-y-5">
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
+                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                  <span>📌</span>
+                  <span>Judul &amp; Subtitle Bagian Acara</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Judul Section Acara
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.eventSectionTitle || 'DETAIL ACARA'}
+                      onChange={(e) => handleChange('eventSectionTitle', e.target.value)}
+                      placeholder="Contoh: DETAIL ACARA"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Subtitle Section Acara
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.eventSectionSubtitle || 'Mohon hadir di hari bahagia kami'}
+                      onChange={(e) => handleChange('eventSectionSubtitle', e.target.value)}
+                      placeholder="Contoh: Mohon hadir di hari bahagia kami"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 mb-1">
-                    Waktu Akad Nikah
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.akadTime}
-                    onChange={(e) => handleChange('akadTime', e.target.value)}
-                    placeholder="Contoh: 08.00 WIB"
-                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                  />
+              {/* Akad Nikah */}
+              <div className="bg-amber-50/50 p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>💍</span>
+                  <span>Acara 1: Akad Nikah</span>
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nama Acara 1
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.akadTitle || 'Akad Nikah'}
+                      onChange={(e) => handleChange('akadTitle', e.target.value)}
+                      placeholder="Contoh: Akad Nikah"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Hari &amp; Tanggal
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.akadDate || formData.weddingDateFull}
+                      onChange={(e) => handleChange('akadDate', e.target.value)}
+                      placeholder="Contoh: Minggu, 20 Desember 2026"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Waktu Pelaksanaan
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.akadTime}
+                      onChange={(e) => handleChange('akadTime', e.target.value)}
+                      placeholder="Contoh: 08.00 - 10.00 WIB"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 mb-1">
-                    Waktu Resepsi
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.resepsiTime}
-                    onChange={(e) => handleChange('resepsiTime', e.target.value)}
-                    placeholder="Contoh: 11.00 WIB"
-                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Tempat / Gedung Akad
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.akadVenue || formData.venueName}
+                      onChange={(e) => handleChange('akadVenue', e.target.value)}
+                      placeholder="Contoh: Masjid Agung Al-Barkah"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Alamat Singkat Akad
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.akadAddress || formData.venueAddress}
+                      onChange={(e) => handleChange('akadAddress', e.target.value)}
+                      placeholder="Contoh: Jl. Veteran No. 1, Bekasi"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Resepsi */}
+              <div className="bg-rose-50/50 p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>🎉</span>
+                  <span>Acara 2: Resepsi Pernikahan</span>
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nama Acara 2
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiTitle || 'Resepsi Pernikahan'}
+                      onChange={(e) => handleChange('resepsiTitle', e.target.value)}
+                      placeholder="Contoh: Resepsi Pernikahan"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Hari &amp; Tanggal
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiDate || formData.weddingDateFull}
+                      onChange={(e) => handleChange('resepsiDate', e.target.value)}
+                      placeholder="Contoh: Minggu, 20 Desember 2026"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Waktu Pelaksanaan
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiTime}
+                      onChange={(e) => handleChange('resepsiTime', e.target.value)}
+                      placeholder="Contoh: 11.00 - 14.00 WIB"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Tempat / Gedung Resepsi
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiVenue || formData.venueName}
+                      onChange={(e) => handleChange('resepsiVenue', e.target.value)}
+                      placeholder="Contoh: Gedung Serbaguna Melati"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Alamat Singkat Resepsi
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.resepsiAddress || formData.venueAddress}
+                      onChange={(e) => handleChange('resepsiAddress', e.target.value)}
+                      placeholder="Contoh: Jl. Melati No. 12, Jakarta"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -573,9 +883,36 @@ export function CustomizerModal({
           {/* TAB 3: LOKASI & ALAMAT */}
           {activeTab === 'lokasi' && (
             <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Judul Section Lokasi
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.locationSectionTitle || 'LOKASI ACARA'}
+                    onChange={(e) => handleChange('locationSectionTitle', e.target.value)}
+                    placeholder="Contoh: LOKASI ACARA"
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Subtitle Section Lokasi
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.locationSectionSubtitle || 'Lokasi acara pernikahan'}
+                    onChange={(e) => handleChange('locationSectionSubtitle', e.target.value)}
+                    placeholder="Contoh: Lokasi acara pernikahan"
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Nama Tempat / Gedung
+                  Nama Tempat / Gedung Utama
                 </label>
                 <input
                   type="text"
@@ -590,8 +927,8 @@ export function CustomizerModal({
                 <label className="block text-xs font-bold text-stone-700 mb-1">
                   Alamat Lengkap
                 </label>
-                <input
-                  type="text"
+                <textarea
+                  rows={2}
                   value={formData.venueAddress}
                   onChange={(e) => handleChange('venueAddress', e.target.value)}
                   placeholder="Contoh: Jl. Melati No. 12, Jakarta"
@@ -611,8 +948,21 @@ export function CustomizerModal({
                   className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs font-mono text-stone-900 outline-hidden"
                 />
                 <p className="text-[11px] text-stone-500 mt-1">
-                  Link ini akan terbuka saat tamu menekan tombol &ldquo;Buka Google Maps&rdquo;.
+                  Link ini akan terbuka saat tamu menekan tombol navigasi peta.
                 </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Teks Tombol Google Maps
+                </label>
+                <input
+                  type="text"
+                  value={formData.googleMapsButtonText || 'Buka Google Maps'}
+                  onChange={(e) => handleChange('googleMapsButtonText', e.target.value)}
+                  placeholder="Contoh: Buka Google Maps"
+                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                />
               </div>
             </div>
           )}
@@ -701,35 +1051,42 @@ export function CustomizerModal({
           {/* TAB 5: KUTIPAN & CERITA */}
           {activeTab === 'cerita' && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Teks Kutipan / Ayat Suci
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.quoteText}
-                  onChange={(e) => handleChange('quoteText', e.target.value)}
-                  placeholder="Teks ayat atau mutiara kata..."
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm text-stone-900 outline-hidden"
-                />
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
+                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                  <span>📖</span>
+                  <span>Judul &amp; Subtitle Bagian Kisah Kami</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Judul Section Cerita
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.storyTitle || 'OUR STORY'}
+                      onChange={(e) => handleChange('storyTitle', e.target.value)}
+                      placeholder="Contoh: OUR STORY"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Subtitle Section Cerita
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.storySubtitle || 'Kisah sederhana kami'}
+                      onChange={(e) => handleChange('storySubtitle', e.target.value)}
+                      placeholder="Contoh: Kisah sederhana kami"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Sumber Kutipan
-                </label>
-                <input
-                  type="text"
-                  value={formData.quoteSource}
-                  onChange={(e) => handleChange('quoteSource', e.target.value)}
-                  placeholder="Contoh: QS. Ar-Rum : 21"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Kisah Pertemuan (Our Story)
+                  Kisah Pertemuan / Perjalanan Cinta (Our Story)
                 </label>
                 <textarea
                   rows={4}
@@ -739,49 +1096,491 @@ export function CustomizerModal({
                   className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm text-stone-900 outline-hidden"
                 />
               </div>
+
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
+                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                  <span>📜</span>
+                  <span>Kutipan Ayat Suci / Mutiara Kata</span>
+                </span>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Teks Kutipan / Ayat
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.quoteText}
+                    onChange={(e) => handleChange('quoteText', e.target.value)}
+                    placeholder="Teks ayat atau mutiara kata..."
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Sumber Kutipan
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.quoteSource}
+                    onChange={(e) => handleChange('quoteSource', e.target.value)}
+                    placeholder="Contoh: QS. Ar-Rum : 21"
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                  />
+                </div>
+              </div>
             </div>
           )}
 
-          {/* TAB 6: AMPLUP DIGITAL / REKENING */}
+          {/* TAB: GALERI FOTO */}
+          {activeTab === 'galeri' && (
+            <div className="space-y-4">
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
+                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                  <span>🖼️</span>
+                  <span>Judul &amp; Subtitle Bagian Galeri</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Judul Section Galeri
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.gallerySectionTitle || 'GALERI FOTO'}
+                      onChange={(e) => handleChange('gallerySectionTitle', e.target.value)}
+                      placeholder="Contoh: GALERI FOTO"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Subtitle Section Galeri
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.gallerySectionSubtitle || 'Momen-momen indah kami'}
+                      onChange={(e) => handleChange('gallerySectionSubtitle', e.target.value)}
+                      placeholder="Contoh: Momen-momen indah kami"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50/60 border border-blue-300 rounded-xl p-3 text-xs text-blue-900">
+                💡 <strong>Kustomisasi Foto Polaroid:</strong> Masukkan link URL gambar foto prewedding Anda dan tulis keterangan (caption) tulisan tangan di bawahnya. Kosongkan untuk memakai foto bawaan.
+              </div>
+
+              {/* 6 Photo Slots */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {[
+                  { num: 1, photoKey: 'galleryPhoto1' as const, captionKey: 'galleryCaption1' as const, defaultCaption: 'Pertama kali ketemu di kafe itu...' },
+                  { num: 2, photoKey: 'galleryPhoto2' as const, captionKey: 'galleryCaption2' as const, defaultCaption: 'Jalan-jalan sore berdua' },
+                  { num: 3, photoKey: 'galleryPhoto3' as const, captionKey: 'galleryCaption3' as const, defaultCaption: 'Momen lamaran bahagia' },
+                  { num: 4, photoKey: 'galleryPhoto4' as const, captionKey: 'galleryCaption4' as const, defaultCaption: 'Tertawa lepas bersama' },
+                  { num: 5, photoKey: 'galleryPhoto5' as const, captionKey: 'galleryCaption5' as const, defaultCaption: 'Foto pre-wedding favorit' },
+                  { num: 6, photoKey: 'galleryPhoto6' as const, captionKey: 'galleryCaption6' as const, defaultCaption: 'Menuju babak baru kehidupan' },
+                ].map((slot) => (
+                  <div key={slot.num} className="bg-white p-3 rounded-xl border-2 border-stone-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                        <span className="w-5 h-5 rounded-full bg-amber-200 border border-stone-800 flex items-center justify-center text-[10px]">
+                          {slot.num}
+                        </span>
+                        <span>Foto Polaroid #{slot.num}</span>
+                      </span>
+                      {formData[slot.photoKey] && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleChange(slot.photoKey, '');
+                            handleChange(slot.captionKey, '');
+                          }}
+                          className="text-[11px] text-rose-600 hover:text-rose-800 font-bold cursor-pointer"
+                        >
+                          Reset
+                        </button>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-stone-600 mb-0.5">
+                        Link URL Foto
+                      </label>
+                      <input
+                        type="url"
+                        value={formData[slot.photoKey] || ''}
+                        onChange={(e) => handleChange(slot.photoKey, e.target.value)}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full bg-[#fcf9f2] border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1 text-xs font-mono text-stone-900 outline-hidden"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-stone-600 mb-0.5">
+                        Teks Caption (Tulisan Tangan)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData[slot.captionKey] || ''}
+                        onChange={(e) => handleChange(slot.captionKey, e.target.value)}
+                        placeholder={slot.defaultCaption}
+                        className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1 text-xs text-stone-900 outline-hidden"
+                      />
+                    </div>
+                    {formData[slot.photoKey] && (
+                      <div className="pt-1 text-center">
+                        <img
+                          src={formData[slot.photoKey]}
+                          alt={`Preview ${slot.num}`}
+                          className="h-20 w-auto max-w-full mx-auto object-cover rounded-md border border-stone-300"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: HADIAH & REKENING */}
           {activeTab === 'hadiah' && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Nama Bank / E-Wallet
-                </label>
-                <input
-                  type="text"
-                  value={formData.bankName}
-                  onChange={(e) => handleChange('bankName', e.target.value)}
-                  placeholder="Contoh: Bank BCA / Mandiri / GoPay"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                />
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
+                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                  <span>🎁</span>
+                  <span>Judul &amp; Pesan Hadiah (Wedding Gift)</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Judul Section Hadiah
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.giftSectionTitle || 'WEDDING GIFT'}
+                      onChange={(e) => handleChange('giftSectionTitle', e.target.value)}
+                      placeholder="Contoh: WEDDING GIFT"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Subtitle Section Hadiah
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.giftSectionSubtitle || 'Tanda kasih & doa restu'}
+                      onChange={(e) => handleChange('giftSectionSubtitle', e.target.value)}
+                      placeholder="Contoh: Tanda kasih & doa restu"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Catatan Pesan Hadiah
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={
+                      formData.giftNotice ||
+                      'Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Namun jika memberi adalah ungkapan tanda kasih, Anda dapat memberi kado secara digital atau fisik.'
+                    }
+                    onChange={(e) => handleChange('giftNotice', e.target.value)}
+                    placeholder="Pesan catatan hadiah..."
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Nomor Rekening
-                </label>
-                <input
-                  type="text"
-                  value={formData.bankAccountNumber}
-                  onChange={(e) => handleChange('bankAccountNumber', e.target.value)}
-                  placeholder="Contoh: 1234 5678 9012"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-mono font-bold text-stone-900 outline-hidden"
-                />
+              {/* Rekening 1 */}
+              <div className="bg-white p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>💳</span>
+                  <span>Rekening Utama (Bank / E-Wallet 1)</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nama Bank / E-Wallet
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.bankName}
+                      onChange={(e) => handleChange('bankName', e.target.value)}
+                      placeholder="Contoh: Bank BCA"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nomor Rekening
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.bankAccountNumber}
+                      onChange={(e) => handleChange('bankAccountNumber', e.target.value)}
+                      placeholder="Contoh: 1234567890"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Atas Nama
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.bankAccountHolder}
+                      onChange={(e) => handleChange('bankAccountHolder', e.target.value)}
+                      placeholder="Contoh: Andi Pratama"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  Atas Nama Pemilik Rekening
-                </label>
-                <input
-                  type="text"
-                  value={formData.bankAccountHolder}
-                  onChange={(e) => handleChange('bankAccountHolder', e.target.value)}
-                  placeholder="Contoh: Andi & Sinta"
-                  className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-2 text-sm font-bold text-stone-900 outline-hidden"
-                />
+              {/* Rekening 2 */}
+              <div className="bg-white p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>💳</span>
+                  <span>Rekening Kedua (Opsional)</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nama Bank / E-Wallet 2
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.bankName2 || ''}
+                      onChange={(e) => handleChange('bankName2', e.target.value)}
+                      placeholder="Contoh: Bank Mandiri / GoPay"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nomor Rekening 2
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.bankAccountNumber2 || ''}
+                      onChange={(e) => handleChange('bankAccountNumber2', e.target.value)}
+                      placeholder="Contoh: 9876543210"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Atas Nama 2
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.bankAccountHolder2 || ''}
+                      onChange={(e) => handleChange('bankAccountHolder2', e.target.value)}
+                      placeholder="Contoh: Sinta Dewi"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Kado Fisik */}
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
+                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                  <span>📦</span>
+                  <span>Alamat Pengiriman Kado Fisik</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nama Penerima Kado
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.giftAddressRecipient || `${formData.groomName} & ${formData.brideName}`}
+                      onChange={(e) => handleChange('giftAddressRecipient', e.target.value)}
+                      placeholder="Contoh: Andi Pratama"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nomor Telepon / WhatsApp
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.giftAddressPhone || ''}
+                      onChange={(e) => handleChange('giftAddressPhone', e.target.value)}
+                      placeholder="Contoh: 08123456789"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Alamat Lengkap Pengiriman
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.giftAddress || ''}
+                    onChange={(e) => handleChange('giftAddress', e.target.value)}
+                    placeholder="Contoh: Jl. Mawar No. 10, RT 01/RW 02, Kebayoran Baru, Jakarta Selatan 12120"
+                    className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: RSVP & PENUTUP */}
+          {activeTab === 'rsvp' && (
+            <div className="space-y-4">
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
+                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                  <span>✉️</span>
+                  <span>Pengaturan Konfirmasi Kehadiran (RSVP)</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Judul Section RSVP
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.rsvpSectionTitle || 'KONFIRMASI KEHADIRAN'}
+                      onChange={(e) => handleChange('rsvpSectionTitle', e.target.value)}
+                      placeholder="Contoh: KONFIRMASI KEHADIRAN"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Subtitle Section RSVP
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.rsvpSectionSubtitle || 'Mohon konfirmasi kehadiran Anda'}
+                      onChange={(e) => handleChange('rsvpSectionSubtitle', e.target.value)}
+                      placeholder="Contoh: Mohon konfirmasi kehadiran Anda"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Catatan RSVP
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.rsvpNotice || 'Konfirmasi paling lambat H-3 acara pernikahan'}
+                      onChange={(e) => handleChange('rsvpNotice', e.target.value)}
+                      placeholder="Contoh: Konfirmasi paling lambat H-3"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Nomor WhatsApp Penerima Notifikasi RSVP
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.rsvpWhatsappNumber || ''}
+                      onChange={(e) => handleChange('rsvpWhatsappNumber', e.target.value)}
+                      placeholder="Contoh: 6281234567890"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Ucapan & Doa */}
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-300 space-y-3">
+                <span className="font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                  <span>💬</span>
+                  <span>Judul Bagian Ucapan &amp; Doa Tamu</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Judul Section Doa
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.wishesSectionTitle || 'DOA & UCAPAN'}
+                      onChange={(e) => handleChange('wishesSectionTitle', e.target.value)}
+                      placeholder="Contoh: DOA & UCAPAN"
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Subtitle Section Doa
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.wishesSectionSubtitle || 'Tulis doa dan harapan terbaik untuk kedua mempelai'}
+                      onChange={(e) => handleChange('wishesSectionSubtitle', e.target.value)}
+                      placeholder="Contoh: Tulis doa dan harapan terbaik..."
+                      className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Penutup Undangan */}
+              <div className="bg-amber-50/50 p-3.5 rounded-xl border-2 border-stone-800 space-y-3">
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <span>🌸</span>
+                  <span>Teks &amp; Salam Penutup Undangan</span>
+                </span>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Kalimat Penutup
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={
+                      formData.closingText ||
+                      'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu kepada kedua mempelai.'
+                    }
+                    onChange={(e) => handleChange('closingText', e.target.value)}
+                    placeholder="Kalimat penutup..."
+                    className="w-full bg-white border-2 border-stone-400 focus:border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-900 outline-hidden"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Salam Penutup
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.closingSalam || "Wassalamu'alaikum Warahmatullahi Wabarakatuh"}
+                      onChange={(e) => handleChange('closingSalam', e.target.value)}
+                      placeholder="Contoh: Wassalamu'alaikum Warahmatullahi Wabarakatuh"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-900 outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 mb-1">
+                      Keluarga Besar / Hormat Kami
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.closingFamily || `Keluarga Besar ${formData.groomName} & ${formData.brideName}`}
+                      onChange={(e) => handleChange('closingFamily', e.target.value)}
+                      placeholder="Contoh: Keluarga Besar Bpk. Bambang & Bpk. Hendra"
+                      className="w-full bg-white border border-stone-400 focus:border-stone-800 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-900 outline-hidden"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}

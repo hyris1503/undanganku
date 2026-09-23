@@ -38,13 +38,16 @@ export function ComicCover({ onOpenInvitation, data, guestName }: ComicCoverProp
 
       {/* Comic Content Canvas */}
       <div
-        className={`bg-[#f7f3ec] border-2 border-stone-800 p-4 sm:p-6 shadow-md ${
+        className={`relative bg-[#f7f3ec] border-2 border-stone-800 p-4 sm:p-6 shadow-[5px_6px_0px_#231f1d] ${
           showMockup ? 'rounded-b-xl' : 'rounded-2xl'
         }`}
       >
+        {/* Washi tape accent on top */}
+        <div className="washi-tape-strip" />
+
         {/* 1. Animasi / Bahan Komik di Awal (Jika diisi URL kustom) */}
         {data.comicOpeningAnimationUrl ? (
-          <div className="mb-6 rounded-2xl overflow-hidden border-2 border-stone-800 shadow-sm bg-white p-2 text-center">
+          <div className="mb-6 rounded-2xl overflow-hidden border-2 border-stone-800 shadow-[3px_4px_0px_#231f1d] bg-white p-2 text-center relative group">
             <img
               src={data.comicOpeningAnimationUrl}
               alt="Animasi Komik Pembuka"
@@ -59,7 +62,7 @@ export function ComicCover({ onOpenInvitation, data, guestName }: ComicCoverProp
         {/* Invitation Headline Area */}
         <div className="text-center mt-8 mb-6">
           <p className="font-hand tracking-widest text-sm sm:text-base text-stone-700 font-bold uppercase">
-            THE WEDDING OF
+            {data.coverTitle || 'THE WEDDING OF'}
           </p>
 
           <div className="relative inline-block my-2">
@@ -97,8 +100,8 @@ export function ComicCover({ onOpenInvitation, data, guestName }: ComicCoverProp
             {data.weddingDate}
           </p>
 
-          {/* Dedicated Personalized Guest Greeting Card */}
-          <div className="mt-4 mb-2 inline-block bg-[#efe7db] border-2 border-stone-800 rounded-2xl px-6 py-3.5 text-center shadow-sm animate-in fade-in max-w-xs w-full">
+          {/* Dedicated Personalized Guest Greeting Card with 3D Depth */}
+          <div className="mt-4 mb-2 inline-block bg-[#f3ebe0] border-2 border-stone-800 rounded-2xl px-6 py-3.5 text-center shadow-[3px_4px_0px_#231f1d] animate-in fade-in max-w-xs w-full relative">
             <p className="font-hand text-xs text-stone-600 font-bold uppercase tracking-wider">
               Kepada Yth. Bapak/Ibu/Saudara/i:
             </p>
@@ -111,68 +114,28 @@ export function ComicCover({ onOpenInvitation, data, guestName }: ComicCoverProp
           </div>
 
           <p className="font-hand text-stone-600 text-sm sm:text-base mt-2 max-w-md mx-auto">
-            Kami mengundang Anda untuk hadir di hari bahagia kami
+            {data.coverSubtitle || 'Kami mengundang Anda untuk hadir di hari bahagia kami'}
           </p>
 
-          {/* Call to action: "Buka Undangan" */}
+          {/* Call to action: "Buka Undangan" with Tactile 3D Button */}
           <div className="mt-5">
             <button
               id="btn-lihat-undangan"
               onClick={onOpenInvitation}
-              className="inline-flex items-center gap-3 bg-[#24292e] hover:bg-stone-900 active:scale-95 text-amber-200 hover:text-white font-hand font-extrabold text-base sm:text-lg px-9 py-3.5 rounded-full border-2 border-stone-800 shadow-md transition-all cursor-pointer group hover:shadow-lg hover:-translate-y-0.5"
+              className="inline-flex items-center gap-3 bg-[#24292e] hover:bg-stone-900 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-amber-200 hover:text-white font-hand font-extrabold text-base sm:text-lg px-9 py-3.5 rounded-full border-2 border-stone-800 shadow-[4px_5px_0px_#181514] transition-all cursor-pointer group hover:scale-[1.02]"
             >
               <Mail className="w-5 h-5 text-amber-300 group-hover:scale-110 transition-transform" />
-              <span>Buka Undangan</span>
+              <span>{data.coverButtonText || 'Buka Undangan'}</span>
             </button>
+            {data.coverAudioNotice && (
+              <p className="font-hand text-xs text-stone-500 mt-2 italic">
+                {data.coverAudioNotice}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Bottom 4 Summary Columns in Photo 1 */}
-        <div className="bg-[#fefdfb] border-2 border-stone-800 rounded-xl p-4 sm:p-5 mt-8 shadow-xs">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-center divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
-            {/* 1. Hari & Tanggal */}
-            <div className="pt-2 sm:pt-0 sm:px-2 flex flex-col items-center">
-              <div className="w-8 h-8 rounded-full bg-amber-50 border border-stone-700 flex items-center justify-center mb-1.5 text-stone-800">
-                <Calendar className="w-4 h-4" />
-              </div>
-              <p className="font-hand font-bold text-sm text-stone-900">Hari &amp; Tanggal</p>
-              <p className="font-hand text-xs text-stone-600 mt-0.5">{data.weddingDateFull}</p>
-              <p className="font-hand text-xs text-stone-600">{data.akadTime}</p>
-            </div>
-
-            {/* 2. Lokasi */}
-            <div className="pt-4 sm:pt-0 sm:px-2 flex flex-col items-center">
-              <div className="w-8 h-8 rounded-full bg-amber-50 border border-stone-700 flex items-center justify-center mb-1.5 text-stone-800">
-                <MapPin className="w-4 h-4" />
-              </div>
-              <p className="font-hand font-bold text-sm text-stone-900">Lokasi</p>
-              <p className="font-hand text-xs text-stone-600 mt-0.5">{data.venueName}</p>
-              <p className="font-hand text-xs text-stone-600 truncate max-w-[130px]">{data.venueAddress}</p>
-            </div>
-
-            {/* 3. Konfirmasi Kehadiran */}
-            <div className="pt-4 sm:pt-0 sm:px-2 flex flex-col items-center">
-              <div className="w-8 h-8 rounded-full bg-amber-50 border border-stone-700 flex items-center justify-center mb-1.5 text-stone-800">
-                <Gift className="w-4 h-4" />
-              </div>
-              <p className="font-hand font-bold text-sm text-stone-900">Konfirmasi Kehadiran</p>
-              <p className="font-hand text-xs text-stone-600 mt-0.5">
-                Mohon konfirmasi melalui form yang tersedia
-              </p>
-            </div>
-
-            {/* 4. Terima Kasih */}
-            <div className="pt-4 sm:pt-0 sm:px-2 flex flex-col items-center">
-              <div className="w-8 h-8 rounded-full bg-amber-50 border border-stone-700 flex items-center justify-center mb-1.5 text-stone-800">
-                <Heart className="w-4 h-4 text-[#d97a68]" />
-              </div>
-              <p className="font-hand font-bold text-sm text-stone-900">Terima Kasih</p>
-              <p className="font-hand text-xs text-stone-600 mt-0.5">
-                Atas doa dan restu yang telah diberikan
-              </p>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Footer note: — Andi & Sinta — */}
         <div className="text-center mt-5">

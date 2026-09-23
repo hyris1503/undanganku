@@ -483,12 +483,24 @@ export function MapIllustration() {
   );
 }
 
-/** 4 Polaroid Photo Illustrations */
-export function PolaroidGallery({ onSelect }: { onSelect?: (index: number) => void }) {
+/** 6 Polaroid Photo Illustrations with Custom Photos Support */
+export interface GalleryPhotoItem {
+  imageUrl?: string;
+  caption?: string;
+}
+
+export function PolaroidGallery({
+  onSelect,
+  customPhotos,
+}: {
+  onSelect?: (index: number) => void;
+  customPhotos?: (GalleryPhotoItem | undefined)[];
+}) {
   const polaroids = [
     {
-      title: "Momen Manis Pertama",
+      title: customPhotos?.[0]?.caption || "Momen Manis Pertama",
       desc: "Pertemuan hangat di awal kisah kita",
+      customUrl: customPhotos?.[0]?.imageUrl,
       svg: (
         <svg viewBox="0 0 160 140" className="w-full h-full">
           <rect width="160" height="140" fill="#f4ede2" />
@@ -509,8 +521,9 @@ export function PolaroidGallery({ onSelect }: { onSelect?: (index: number) => vo
       ),
     },
     {
-      title: "Senja di Pantai",
+      title: customPhotos?.[1]?.caption || "Senja di Pantai",
       desc: "Menikmati matahari terbenam berdua",
+      customUrl: customPhotos?.[1]?.imageUrl,
       svg: (
         <svg viewBox="0 0 160 140" className="w-full h-full">
           {/* Sunset sky gradient */}
@@ -530,8 +543,9 @@ export function PolaroidGallery({ onSelect }: { onSelect?: (index: number) => vo
       ),
     },
     {
-      title: "Ceria Bersama",
+      title: customPhotos?.[2]?.caption || "Ceria Bersama",
       desc: "Tawa yang selalu mewarnai hari-hari",
+      customUrl: customPhotos?.[2]?.imageUrl,
       svg: (
         <svg viewBox="0 0 160 140" className="w-full h-full">
           <rect width="160" height="140" fill="#f4ede2" />
@@ -556,8 +570,9 @@ export function PolaroidGallery({ onSelect }: { onSelect?: (index: number) => vo
       ),
     },
     {
-      title: "Hangat & Penuh Kasih",
+      title: customPhotos?.[3]?.caption || "Hangat & Penuh Kasih",
       desc: "Selalu ada untuk saling menjaga",
+      customUrl: customPhotos?.[3]?.imageUrl,
       svg: (
         <svg viewBox="0 0 160 140" className="w-full h-full">
           <rect width="160" height="140" fill="#f4ede2" />
@@ -583,25 +598,85 @@ export function PolaroidGallery({ onSelect }: { onSelect?: (index: number) => vo
         </svg>
       ),
     },
+    {
+      title: customPhotos?.[4]?.caption || "Janji Suci",
+      desc: "Menatap masa depan bersama",
+      customUrl: customPhotos?.[4]?.imageUrl,
+      svg: (
+        <svg viewBox="0 0 160 140" className="w-full h-full">
+          <rect width="160" height="140" fill="#faebd7" />
+          <circle cx="80" cy="70" r="32" fill="#fed7aa" opacity="0.8" />
+          <g transform="translate(62, 50)">
+            <rect x="8" y="18" width="20" height="18" rx="3" fill="#b91c1c" stroke="#222" strokeWidth="1.8" />
+            <polygon points="8,18 18,6 28,18" fill="#ef4444" stroke="#222" strokeWidth="1.8" />
+            <circle cx="18" cy="14" r="5" fill="#e0f2fe" stroke="#0284c7" strokeWidth="1.5" />
+            <line x1="18" y1="5" x2="18" y2="2" stroke="#f59e0b" strokeWidth="1.8" />
+            <line x1="26" y1="10" x2="29" y2="8" stroke="#f59e0b" strokeWidth="1.8" />
+            <line x1="10" y1="10" x2="7" y2="8" stroke="#f59e0b" strokeWidth="1.8" />
+          </g>
+          <text x="80" y="115" textAnchor="middle" font-family="'Patrick Hand', cursive, sans-serif" font-size="13" font-weight="bold" fill="#333">
+            Forever &amp; Always ❤️
+          </text>
+        </svg>
+      ),
+    },
+    {
+      title: customPhotos?.[5]?.caption || "Menuju Bahagia",
+      desc: "Melangkah beriringan selamanya",
+      customUrl: customPhotos?.[5]?.imageUrl,
+      svg: (
+        <svg viewBox="0 0 160 140" className="w-full h-full">
+          <rect width="160" height="140" fill="#f4ede2" />
+          <g transform="translate(32, 25)">
+            <ellipse cx="28" cy="50" rx="18" ry="18" fill="#ffd5be" stroke="#222" strokeWidth="1.8" />
+            <path d="M12 48 C10 30 22 20 40 20 C52 20 54 30 52 50 Z" fill="#282220" stroke="#222" strokeWidth="1.8" />
+            <circle cx="28" cy="50" r="2.5" fill="#222" />
+            <ellipse cx="75" cy="52" rx="16" ry="15" fill="#ffe0cf" stroke="#222" strokeWidth="1.8" />
+            <path d="M58 50 C56 32 68 22 84 22 C95 22 100 32 98 60 Z" fill="#4d3326" stroke="#222" strokeWidth="1.8" />
+            <circle cx="70" cy="52" r="2.5" fill="#222" />
+            <path d="M50 30 Q52 35 50 40 Q48 35 50 30" fill="#e8c872" stroke="#222" strokeWidth="1" />
+            <circle cx="50" cy="35" r="2" fill="#d97a68" />
+          </g>
+          <text x="80" y="118" textAnchor="middle" font-family="'Patrick Hand', cursive, sans-serif" font-size="12" font-weight="bold" fill="#555">
+            Together as One
+          </text>
+        </svg>
+      ),
+    },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-md mx-auto">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 max-w-lg mx-auto">
       {polaroids.map((item, idx) => (
         <div
           key={idx}
           onClick={() => onSelect && onSelect(idx)}
-          className="relative bg-white p-2 pb-5 border-2 border-stone-800 rounded-sm shadow-sm hover:shadow-md transition-transform hover:-translate-y-1 cursor-pointer group"
+          className="relative bg-white p-2 pb-5 border-2 border-stone-800 rounded-sm shadow-[3px_4px_0px_#231f1d] hover:shadow-[5px_6px_0px_#231f1d] transition-all hover:-translate-y-1 cursor-pointer group"
         >
-          {/* Tape strip on top */}
-          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-10 h-4 bg-amber-100/90 border border-amber-300/60 rotate-[-4deg] opacity-85 z-10 shadow-xs pointer-events-none" />
+          {/* Tape strip on top with alternating tilt */}
+          <div
+            className={`absolute -top-2 left-1/2 -translate-x-1/2 w-10 h-4 bg-amber-100/90 border border-amber-300/70 opacity-90 z-10 shadow-xs pointer-events-none ${
+              idx % 2 === 0 ? 'rotate-[-3deg]' : 'rotate-[3deg]'
+            }`}
+          />
 
           {/* Picture frame */}
-          <div className="border border-stone-800/40 rounded-xs overflow-hidden aspect-square flex items-center justify-center bg-stone-100">
-            {item.svg}
+          <div className="border border-stone-800/40 rounded-xs overflow-hidden aspect-square flex items-center justify-center bg-stone-100 relative">
+            {item.customUrl ? (
+              <img
+                src={item.customUrl}
+                alt={item.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              item.svg
+            )}
           </div>
 
-          <div className="text-center mt-2">
+          <div className="text-center mt-2 px-1">
             <p className="font-hand text-xs md:text-sm font-bold text-stone-800 truncate">
               {item.title}
             </p>
