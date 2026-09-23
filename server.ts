@@ -7,9 +7,14 @@ const DATA_FILE = path.join(process.cwd(), "invitation-data.json");
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   app.use(express.json({ limit: "10mb" }));
+
+  // Health check endpoint for Cloud Run
+  app.get("/health", (req, res) => {
+    res.status(200).send("OK");
+  });
 
   // API Route to fetch persistent invitation data
   app.get("/api/invitation-data", (req, res) => {
